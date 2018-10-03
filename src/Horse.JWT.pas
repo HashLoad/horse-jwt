@@ -8,8 +8,8 @@ uses
   JOSE.Consumer, JOSE.Context, REST.JSON;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-function DelphiJWT(ASecretJWT: string): THorseCallback; overload;
-function DelphiJWT(ASecretJWT: string; ASessionClass: TClass)
+function HorseJWT(ASecretJWT: string): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass)
   : THorseCallback; overload;
 
 implementation
@@ -18,13 +18,13 @@ var
   SecretJWT: string;
   SessionClass: TClass;
 
-function DelphiJWT(ASecretJWT: string): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string): THorseCallback; overload;
 begin
   SecretJWT := ASecretJWT;
   Result := Middleware;
 end;
 
-function DelphiJWT(ASecretJWT: string; ASessionClass: TClass)
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass)
   : THorseCallback; overload;
 begin
   SecretJWT := ASecretJWT;

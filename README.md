@@ -4,7 +4,7 @@ Middleware for JWT in HORSE
 Sample Horse Server Validate JWT
 ```delphi
 uses
-  Horse, Horse.DelphiJWT;
+  Horse, Horse.JWT;
 
 var
   App: THorse;
@@ -12,7 +12,7 @@ var
 begin
   App := THorse.Create(9000);
 
-  App.Use(DephiJWT('jwt-secret')); 
+  App.Use(HorseJWT('jwt-secret')); 
 
   App.Post('ping',
     procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
@@ -26,7 +26,7 @@ begin
 Validate JWT and get custom session
 ```delphi
 uses
-  Horse, Horse.DelphiJWT;
+  Horse, Horse.JWT;
 
 var
   App: THorse;
@@ -34,7 +34,7 @@ var
 begin
   App := THorse.Create(9000);
 
-  App.Use(DephiJWT('jwt-secret', TMySession)); 
+  App.Use(HorseJWT('jwt-secret', TMySession)); 
 
   App.Post('ping',
     procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
