@@ -41,7 +41,8 @@ var
   LSession: TObject;
   LJSON: TJSONObject;
 begin
-  if not Req.Headers.TryGetValue('authorization', LToken) then
+  if not Req.Headers.TryGetValue('authorization', LToken)
+    and not Req.Query.TryGetValue('authorization', LToken) then
   begin
     Res.Send('Token not found').Status(401);
     raise EHorseCallbackInterrupted.Create;

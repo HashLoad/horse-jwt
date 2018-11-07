@@ -63,7 +63,7 @@
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
         <SanitizedProjectName>horse_jwt</SanitizedProjectName>
-        <DCC_UnitSearchPath>C:\Users\hunsc\projects\hashload\horse-jwt\modules\horse\src\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\Basic\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\Console\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\CustomClaims\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Source\Common\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Source\JOSE\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>C:\Users\hunsc\projects\hashload\horse-jwt\modules\horse\src\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\Basic\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\Console\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\CustomClaims\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Source\Common\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Source\JOSE\;$(DCC_UnitSearchPath);modules\delphi-jwt\Samples\Basic;modules\delphi-jwt\Samples\Console;modules\delphi-jwt\Samples\CustomClaims;modules\delphi-jwt\Source\Common;modules\delphi-jwt\Source\JOSE;modules\horse\src</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice32)'!=''">
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
