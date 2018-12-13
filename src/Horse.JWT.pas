@@ -8,28 +8,29 @@ uses
   JOSE.Consumer, JOSE.Context, REST.JSON;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-function HorseJWT(ASecretJWT: string): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass)
-  : THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
 
 implementation
 
 var
   SecretJWT: string;
   SessionClass: TClass;
+  Header: string;
 
-function HorseJWT(ASecretJWT: string): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
 begin
+  Header := 'authorization';
   SecretJWT := ASecretJWT;
-  Result := Middleware;
+  Header := AHeader;
+  Result := Middleware
 end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass)
-  : THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
 begin
-  SecretJWT := ASecretJWT;
+  Result := HorseJWT(ASecretJWT);
   SessionClass := ASessionClass;
-  Result := Middleware;
+  Header := AHeader;
 end;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse;
@@ -41,8 +42,8 @@ var
   LSession: TObject;
   LJSON: TJSONObject;
 begin
-  if not Req.Headers.TryGetValue('authorization', LToken)
-    and not Req.Query.TryGetValue('authorization', LToken) then
+  if not Req.Headers.TryGetValue(Header, LToken)
+    and not Req.Query.TryGetValue(Header, LToken) then
   begin
     Res.Send('Token not found').Status(401);
     raise EHorseCallbackInterrupted.Create;
