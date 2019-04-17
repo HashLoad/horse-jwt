@@ -9,7 +9,8 @@ uses
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization')
+  : THorseCallback; overload;
 
 implementation
 
@@ -26,15 +27,15 @@ begin
   Result := Middleware
 end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization')
+  : THorseCallback; overload;
 begin
   Result := HorseJWT(ASecretJWT);
   SessionClass := ASessionClass;
   Header := AHeader;
 end;
 
-procedure Middleware(Req: THorseRequest; Res: THorseResponse;
-  Next: TProc);
+procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LValidations: TJOSEConsumer;
   LJWT: TJOSEContext;
@@ -42,8 +43,7 @@ var
   LSession: TObject;
   LJSON: TJSONObject;
 begin
-  if not Req.Headers.TryGetValue(Header, LToken)
-    and not Req.Query.TryGetValue(Header, LToken) then
+  if not Req.Headers.TryGetValue(Header, LToken) and not Req.Query.TryGetValue(Header, LToken) then
   begin
     Res.Send('Token not found').Status(401);
     raise EHorseCallbackInterrupted.Create;
@@ -51,24 +51,29 @@ begin
 
   LToken := LToken.Replace('bearer ', '', [rfIgnoreCase]);
 
-  LValidations := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey
-    (SecretJWT).SetSkipVerificationKeyValidation.
-    SetRequireExpirationTime.Build;
+  LValidations := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey(SecretJWT)
+    .SetSkipVerificationKeyValidation.SetRequireExpirationTime.Build;
 
   LJWT := TJOSEContext.Create(LToken, TJWTClaims);
   try
-    LValidations.ProcessContext(LJWT);
-    LJSON := LJWT.GetClaims.JSON;
+    try
+      LValidations.ProcessContext(LJWT);
+      LJSON := LJWT.GetClaims.JSON;
 
-    if Assigned(SessionClass) then
-    begin
-      LSession := SessionClass.Create;
-      TJson.JsonToObject(LSession, LJSON);
-    end
-    else
-      LSession := LJSON;
+      if Assigned(SessionClass) then
+      begin
+        LSession := SessionClass.Create;
+        TJson.JsonToObject(LSession, LJSON);
+      end
+      else
+        LSession := LJSON;
 
-    THorseHackRequest(Req).SetSession(LSession);
+      THorseHackRequest(Req).SetSession(LSession);
+
+    finally
+      LJSON.Free;
+    end;
+
   except
     Res.Send('Unauthorized').Status(401);
     raise EHorseCallbackInterrupted.Create;
