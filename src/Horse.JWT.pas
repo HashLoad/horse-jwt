@@ -53,34 +53,38 @@ begin
 
   LValidations := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey(SecretJWT)
     .SetSkipVerificationKeyValidation.SetRequireExpirationTime.Build;
-
-  LJWT := TJOSEContext.Create(LToken, TJWTClaims);
   try
+
+    LJWT := TJOSEContext.Create(LToken, TJWTClaims);
     try
       try
-        LValidations.ProcessContext(LJWT);
-        LJSON := LJWT.GetClaims.JSON;
+        try
+          LValidations.ProcessContext(LJWT);
+          LJSON := LJWT.GetClaims.JSON;
 
-        if Assigned(SessionClass) then
-        begin
-          LSession := SessionClass.Create;
-          TJson.JsonToObject(LSession, LJSON);
-        end
-        else
-          LSession := LJSON;
+          if Assigned(SessionClass) then
+          begin
+            LSession := SessionClass.Create;
+            TJson.JsonToObject(LSession, LJSON);
+          end
+          else
+            LSession := LJSON;
 
-        THorseHackRequest(Req).SetSession(LSession);
-        Next();
-      finally
-        LSession.Free;
+          THorseHackRequest(Req).SetSession(LSession);
+          Next();
+        finally
+          LSession.Free;
+        end;
+
+      except
+        Res.Send('Unauthorized').Status(401);
+        raise EHorseCallbackInterrupted.Create;
       end;
-
-    except
-      Res.Send('Unauthorized').Status(401);
-      raise EHorseCallbackInterrupted.Create;
+    finally
+      LJWT.Free;
     end;
   finally
-    LJWT.Free;
+    LValidations.Free;
   end;
 end;
 
