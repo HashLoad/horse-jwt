@@ -58,28 +58,37 @@ begin
     LJWT := TJOSEContext.Create(LToken, TJWTClaims);
     try
       try
-        try
-          LValidations.ProcessContext(LJWT);
-          LJSON := LJWT.GetClaims.JSON;
 
-          if Assigned(SessionClass) then
-          begin
-            LSession := SessionClass.Create;
-            TJson.JsonToObject(LSession, LJSON);
-          end
-          else
-            LSession := LJSON;
+        LValidations.ProcessContext(LJWT);
+        LJSON := LJWT.GetClaims.JSON;
 
-          THorseHackRequest(Req).SetSession(LSession);
-          Next();
-        finally
-          LSession.Free;
-        end;
+        if Assigned(SessionClass) then
+        begin
+          LSession := SessionClass.Create;
+          TJson.JsonToObject(LSession, LJSON);
+        end
+        else
+          LSession := LJSON;
+
+        THorseHackRequest(Req).SetSession(LSession);
 
       except
-        Res.Send('Unauthorized').Status(401);
-        raise EHorseCallbackInterrupted.Create;
+        on E: exception do
+        begin
+          if E.InheritsFrom(EHorseCallbackInterrupted) then
+            raise EHorseCallbackInterrupted(E);
+          Res.Send('Unauthorized').Status(401);
+          raise EHorseCallbackInterrupted.Create;
+        end;
       end;
+
+      try
+        Next();
+      finally
+        if Assigned(LSession) then
+          LSession.Free;
+      end;
+
     finally
       LJWT.Free;
     end;
