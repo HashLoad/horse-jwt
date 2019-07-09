@@ -63,12 +63,11 @@ begin
         LJSON := LJWT.GetClaims.JSON;
 
         if Assigned(SessionClass) then
-        begin
-          LSession := SessionClass.Create;
-          TJson.JsonToObject(LSession, LJSON);
-        end
+          LSession := SessionClass.Create
         else
-          LSession := LJSON;
+          LSession := TJSONValue.Create;
+
+        TJson.JsonToObject(LSession, LJSON);
 
         THorseHackRequest(Req).SetSession(LSession);
 
