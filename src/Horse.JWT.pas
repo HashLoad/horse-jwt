@@ -21,7 +21,6 @@ var
 
 function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
 begin
-  Header := 'authorization';
   SecretJWT := ASecretJWT;
   Header := AHeader;
   Result := Middleware
