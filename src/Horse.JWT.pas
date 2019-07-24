@@ -9,8 +9,7 @@ uses
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization')
-  : THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
 
 implementation
 
@@ -23,15 +22,14 @@ function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorse
 begin
   SecretJWT := ASecretJWT;
   Header := AHeader;
-  Result := Middleware
+  Result := Middleware;
 end;
 
 function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization')
   : THorseCallback; overload;
 begin
-  Result := HorseJWT(ASecretJWT);
+  Result := HorseJWT(ASecretJWT, AHeader);
   SessionClass := ASessionClass;
-  Header := AHeader;
 end;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
