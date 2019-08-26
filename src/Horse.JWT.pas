@@ -2,10 +2,8 @@ unit Horse.JWT;
 
 interface
 
-uses
-  Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils,
-  JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators,
-  JOSE.Consumer, JOSE.Context, REST.JSON;
+uses Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils, JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder,
+  JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context, REST.JSON;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
@@ -25,8 +23,7 @@ begin
   Result := Middleware;
 end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization')
-  : THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
 begin
   Result := HorseJWT(ASecretJWT, AHeader);
   SessionClass := ASessionClass;
@@ -46,16 +43,20 @@ begin
     raise EHorseCallbackInterrupted.Create;
   end;
 
+  if Pos('bearer', LowerCase(LToken)) = 0 then
+  begin
+    Res.Send('Invalid authorization type').Status(401);
+    raise EHorseCallbackInterrupted.Create;
+  end;
+
   LToken := LToken.Replace('bearer ', '', [rfIgnoreCase]);
+  LValidations := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey(SecretJWT).SetSkipVerificationKeyValidation
+    .SetRequireExpirationTime.Build;
 
-  LValidations := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey(SecretJWT)
-    .SetSkipVerificationKeyValidation.SetRequireExpirationTime.Build;
   try
-
     LJWT := TJOSEContext.Create(LToken, TJWTClaims);
     try
       try
-
         LValidations.ProcessContext(LJWT);
         LJSON := LJWT.GetClaims.JSON;
 
@@ -65,9 +66,7 @@ begin
           LSession := TJSONValue.Create;
 
         TJson.JsonToObject(LSession, LJSON);
-
         THorseHackRequest(Req).SetSession(LSession);
-
       except
         on E: exception do
         begin
