@@ -1,0 +1,22 @@
+{
+	"hash": "445774d05b3e1b873cfcdb89032b3e1f",
+	"updated": "2019-08-28T21:25:16.439703-03:00",
+	"installedModules": {
+		"github.com/hashload/horse": {
+			"name": "horse",
+			"version": "1.6.7",
+			"hash": "f2d5c64f23435568e5b3e68b5fe927c4",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"github.com/hunsche/delphi-jwt": {
+			"name": "delphi-jwt",
+			"version": "2.2.3",
+			"hash": "59f0e419d889e2103abc7699bd707a2e",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		}
+	}
+}

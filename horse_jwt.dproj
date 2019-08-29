@@ -63,7 +63,7 @@
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
         <SanitizedProjectName>horse_jwt</SanitizedProjectName>
-        <DCC_UnitSearchPath>C:\Users\hunsc\projects\hashload\horse-jwt\modules\horse\src\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\Basic\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\Console\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\CustomClaims\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Source\Common\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Source\JOSE\;$(DCC_UnitSearchPath);modules\delphi-jwt\Samples\Basic;modules\delphi-jwt\Samples\Console;modules\delphi-jwt\Samples\CustomClaims;modules\delphi-jwt\Source\Common;modules\delphi-jwt\Source\JOSE;modules\horse\src</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>C:\Users\hunsc\projects\hashload\horse-jwt\modules\horse\src\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\Basic\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\Console\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Samples\CustomClaims\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Source\Common\;C:\Users\hunsc\projects\hashload\horse-jwt\modules\delphi-jwt\Source\JOSE\;$(DCC_UnitSearchPath);modules\.dcp;modules\.dcu;modules;modules\delphi-jwt\Source\Common;modules\delphi-jwt\Source\JOSE;modules\horse\src</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice32)'!=''">
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
@@ -104,8 +104,8 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="rtl.dcp"></DCCReference>
-        <DCCReference Include="src\Horse.JWT.pas"></DCCReference>
+        <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="src\Horse.JWT.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -433,9 +433,9 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="ProjectiOSDeviceResourceRules"></DeployClass>
-                <DeployClass Name="ProjectiOSEntitlements"></DeployClass>
-                <DeployClass Name="ProjectiOSInfoPList"></DeployClass>
+                <DeployClass Name="ProjectiOSDeviceResourceRules"/>
+                <DeployClass Name="ProjectiOSEntitlements"/>
+                <DeployClass Name="ProjectiOSInfoPList"/>
                 <DeployClass Name="ProjectiOSResource">
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
@@ -447,8 +447,8 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="ProjectOSXEntitlements"></DeployClass>
-                <DeployClass Name="ProjectOSXInfoPList"></DeployClass>
+                <DeployClass Name="ProjectOSXEntitlements"/>
+                <DeployClass Name="ProjectOSXInfoPList"/>
                 <DeployClass Name="ProjectOSXResource">
                     <Platform Name="OSX32">
                         <RemoteDir>Contents\Resources</RemoteDir>
@@ -507,14 +507,14 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"></ProjectRoot>
-                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"></ProjectRoot>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"></ProjectRoot>
-                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"></ProjectRoot>
-                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"></ProjectRoot>
-                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"></ProjectRoot>
-                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"></ProjectRoot>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"></ProjectRoot>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
             </Deployment>
             <Platforms>
                 <Platform value="iOSDevice32">False</Platform>
@@ -527,7 +527,7 @@
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
-    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"></Import>
-    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"></Import>
-    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"></Import>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+    <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
 </Project>
