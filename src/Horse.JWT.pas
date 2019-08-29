@@ -30,6 +30,8 @@ begin
 end;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+const
+  BEARER_AUTH = 'bearer ';
 var
   LValidations: TJOSEConsumer;
   LJWT: TJOSEContext;
@@ -43,13 +45,13 @@ begin
     raise EHorseCallbackInterrupted.Create;
   end;
 
-  if Pos('bearer', LowerCase(LToken)) = 0 then
+  if not LToken.ToLower.StartsWith(BEARER_AUTH) then
   begin
     Res.Send('Invalid authorization type').Status(401);
     raise EHorseCallbackInterrupted.Create;
   end;
 
-  LToken := LToken.Replace('bearer ', '', [rfIgnoreCase]);
+  LToken := LToken.Replace(BEARER_AUTH, '', [rfIgnoreCase]);
   LValidations := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey(SecretJWT).SetSkipVerificationKeyValidation
     .SetRequireExpirationTime.Build;
 
