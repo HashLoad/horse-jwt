@@ -6,8 +6,8 @@ uses Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils, JOSE.Core
   JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context, REST.JSON;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'Authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'Authorization'): THorseCallback; overload;
 
 implementation
 
@@ -16,14 +16,14 @@ var
   SessionClass: TClass;
   Header: string;
 
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'Authorization'): THorseCallback; overload;
 begin
   SecretJWT := ASecretJWT;
   Header := AHeader;
   Result := Middleware;
 end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'Authorization'): THorseCallback; overload;
 begin
   Result := HorseJWT(ASecretJWT, AHeader);
   SessionClass := ASessionClass;
