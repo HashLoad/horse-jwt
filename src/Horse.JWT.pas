@@ -46,7 +46,8 @@ begin
   if Length(LHeaderNormalize) > 0 then
     LHeaderNormalize[1] := UpCase(LHeaderNormalize[1]);
 
-  if not Req.Headers.TryGetValue(Header, LToken) and
+  LToken := Req.Headers[Header];
+  if LToken.Trim.IsEmpty and
     not Req.Query.TryGetValue(Header, LToken) and
     not Req.Query.TryGetValue(LHeaderNormalize, LToken) then
   begin
