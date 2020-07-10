@@ -7,8 +7,8 @@ uses Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils, JOSE.Core
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []; ARequireAudience: Boolean = False): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []; ARequireAudience: Boolean = False): THorseCallback; overload;
 
 implementation
 
@@ -17,20 +17,21 @@ var
   SessionClass: TClass;
   Header: string;
   ExpectedAudience: TArray<string>;
+  RequireAudience: Boolean;
 
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string; AExpectedAudience: TArray<string>; ARequireAudience: Boolean): THorseCallback; overload;
 begin
   SecretJWT := ASecretJWT;
   Header := AHeader;
   ExpectedAudience := AExpectedAudience;
   Result := Middleware;
+  RequireAudience := ARequireAudience;
 end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string; AExpectedAudience: TArray<string>; ARequireAudience: Boolean): THorseCallback; overload;
 begin
-  Result := HorseJWT(ASecretJWT, AHeader);
+  Result := HorseJWT(ASecretJWT, AHeader, AExpectedAudience, ARequireAudience);
   SessionClass := ASessionClass;
-  ExpectedAudience := AExpectedAudience;
 end;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
@@ -64,7 +65,7 @@ begin
   LValidations := TJOSEConsumerBuilder
     .NewConsumer
     .SetVerificationKey(SecretJWT)
-    .SetExpectedAudience(False, ExpectedAudience)
+    .SetExpectedAudience(RequireAudience, ExpectedAudience)
     .SetSkipVerificationKeyValidation
     .SetRequireExpirationTime
     .Build;
