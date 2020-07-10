@@ -2,19 +2,13 @@ unit Horse.JWT;
 
 interface
 
-uses
-  Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils,
-  JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators,
-  JOSE.Consumer, JOSE.Context, REST.JSON;
+uses Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils, JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder,
+  JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context, REST.JSON;
 
-  procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 
-  function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization';
-  AExpectedAudience : TArray<string> = []): THorseCallback; overload;
-
-  function HorseJWT(ASecretJWT: string; ASessionClass: TClass;
-  AHeader: string = 'authorization';
-  AExpectedAudience : TArray<string> = []): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []): THorseCallback; overload;
 
 implementation
 
@@ -24,8 +18,7 @@ var
   Header: string;
   ExpectedAudience: TArray<string>;
 
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization';
-AExpectedAudience : TArray<string> = []): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []): THorseCallback; overload;
 begin
   SecretJWT := ASecretJWT;
   Header := AHeader;
@@ -33,9 +26,7 @@ begin
   Result := Middleware;
 end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass;
-AHeader: string = 'authorization';
-AExpectedAudience : TArray<string> = []): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []): THorseCallback; overload;
 begin
   Result := HorseJWT(ASecretJWT, AHeader);
   SessionClass := ASessionClass;
@@ -51,13 +42,12 @@ var
   LJSON: TJSONObject;
 begin
   LHeaderNormalize := Header;
+
   if Length(LHeaderNormalize) > 0 then
     LHeaderNormalize[1] := UpCase(LHeaderNormalize[1]);
 
   LToken := Req.Headers[Header];
-  if LToken.Trim.IsEmpty and
-    not Req.Query.TryGetValue(Header, LToken) and
-    not Req.Query.TryGetValue(LHeaderNormalize, LToken) then
+  if LToken.Trim.IsEmpty and not Req.Query.TryGetValue(Header, LToken) and not Req.Query.TryGetValue(LHeaderNormalize, LToken) then
   begin
     Res.Send('Token not found').Status(401);
     raise EHorseCallbackInterrupted.Create;
@@ -70,11 +60,14 @@ begin
   end;
 
   LToken := LToken.Replace('bearer ', '', [rfIgnoreCase]);
-  LValidations := TJOSEConsumerBuilder.NewConsumer
-                      .SetVerificationKey(SecretJWT)
-                      .SetExpectedAudience(False,ExpectedAudience)
-                      .SetSkipVerificationKeyValidation
-                      .SetRequireExpirationTime.Build;
+
+  LValidations := TJOSEConsumerBuilder
+    .NewConsumer
+    .SetVerificationKey(SecretJWT)
+    .SetExpectedAudience(False, ExpectedAudience)
+    .SetSkipVerificationKeyValidation
+    .SetRequireExpirationTime
+    .Build;
 
   try
     LJWT := TJOSEContext.Create(LToken, TJWTClaims);
