@@ -3,7 +3,7 @@ unit Horse.JWT;
 interface
 
 uses Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils, JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder,
-  JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context, REST.JSON;
+  JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context, REST.JSON, Horse.Commons;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 
@@ -49,13 +49,13 @@ begin
   LToken := Req.Headers[Header];
   if LToken.Trim.IsEmpty and not Req.Query.TryGetValue(Header, LToken) and not Req.Query.TryGetValue(LHeaderNormalize, LToken) then
   begin
-    Res.Send('Token not found').Status(401);
+    Res.Send('Token not found').Status(THTTPStatus.Unauthorized);
     raise EHorseCallbackInterrupted.Create;
   end;
 
   if Pos('bearer', LowerCase(LToken)) = 0 then
   begin
-    Res.Send('Invalid authorization type').Status(401);
+    Res.Send('Invalid authorization type').Status(THTTPStatus.Unauthorized);
     raise EHorseCallbackInterrupted.Create;
   end;
 
@@ -90,7 +90,7 @@ begin
         begin
           if E.InheritsFrom(EHorseCallbackInterrupted) then
             raise EHorseCallbackInterrupted(E);
-          Res.Send('Unauthorized').Status(401);
+          Res.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
           raise EHorseCallbackInterrupted.Create;
         end;
       end;
