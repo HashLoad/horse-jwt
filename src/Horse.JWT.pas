@@ -2,15 +2,19 @@ unit Horse.JWT;
 
 interface
 
-uses Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils,
-  JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder,
-  JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context, REST.JSON;
+uses
+  Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils,
+  JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators,
+  JOSE.Consumer, JOSE.Context, REST.JSON;
 
-procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization')
-  : THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass;
-  AHeader: string = 'authorization'): THorseCallback; overload;
+  procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
+
+  function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization';
+  AExpectedAudience : TArray<string> = []): THorseCallback; overload;
+
+  function HorseJWT(ASecretJWT: string; ASessionClass: TClass;
+  AHeader: string = 'authorization';
+  AExpectedAudience : TArray<string> = []): THorseCallback; overload;
 
 implementation
 
@@ -18,20 +22,24 @@ var
   SecretJWT: string;
   SessionClass: TClass;
   Header: string;
+  ExpectedAudience: TArray<string>;
 
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization')
-  : THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization';
+AExpectedAudience : TArray<string> = []): THorseCallback; overload;
 begin
   SecretJWT := ASecretJWT;
   Header := AHeader;
+  ExpectedAudience := AExpectedAudience;
   Result := Middleware;
 end;
 
 function HorseJWT(ASecretJWT: string; ASessionClass: TClass;
-  AHeader: string = 'authorization'): THorseCallback; overload;
+AHeader: string = 'authorization';
+AExpectedAudience : TArray<string> = []): THorseCallback; overload;
 begin
   Result := HorseJWT(ASecretJWT, AHeader);
   SessionClass := ASessionClass;
+  ExpectedAudience := AExpectedAudience;
 end;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
@@ -62,8 +70,11 @@ begin
   end;
 
   LToken := LToken.Replace('bearer ', '', [rfIgnoreCase]);
-  LValidations := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey(SecretJWT)
-    .SetSkipVerificationKeyValidation.SetRequireExpirationTime.Build;
+  LValidations := TJOSEConsumerBuilder.NewConsumer
+                      .SetVerificationKey(SecretJWT)
+                      .SetExpectedAudience(False,ExpectedAudience)
+                      .SetSkipVerificationKeyValidation
+                      .SetRequireExpirationTime.Build;
 
   try
     LJWT := TJOSEContext.Create(LToken, TJWTClaims);
