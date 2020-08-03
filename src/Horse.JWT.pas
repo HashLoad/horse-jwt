@@ -7,8 +7,10 @@ uses Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils, JOSE.Core
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []; ARequireAudience: Boolean = False): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []; ARequireAudience: Boolean = False): THorseCallback; overload;
+{$IFDEF ConditionalExpressions}
+function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = {$IF CompilerVersion >= 32.0} [] {$ELSE} nil {$IFEND}; ARequireAudience: Boolean = False): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = {$IF CompilerVersion >= 32.0} [] {$ELSE} nil {$IFEND}; ARequireAudience: Boolean = False): THorseCallback; overload;
+{$ENDIF}
 
 implementation
 
