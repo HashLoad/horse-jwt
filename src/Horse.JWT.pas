@@ -2,13 +2,14 @@ unit Horse.JWT;
 
 interface
 
-uses Horse, System.Classes, System.JSON, Web.HTTPApp, System.SysUtils, JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder,
+uses Horse, System.Classes, System.StrUtils, System.JSON, Web.HTTPApp, System.SysUtils, JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder,
   JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context, REST.JSON, Horse.Commons;
 
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 
 {$IFDEF ConditionalExpressions}
 function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = {$IF CompilerVersion >= 32.0} [] {$ELSE} nil {$IFEND}; ARequireAudience: Boolean = False): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AExpectedRoute: TArray<string>; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []; ARequireAudience: Boolean = False): THorseCallback; overload;
 function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = {$IF CompilerVersion >= 32.0} [] {$ELSE} nil {$IFEND}; ARequireAudience: Boolean = False): THorseCallback; overload;
 {$ENDIF}
 
@@ -19,6 +20,7 @@ var
   SessionClass: TClass;
   Header: string;
   ExpectedAudience: TArray<string>;
+  ExpectedRoute: TArray<string>;
   RequireAudience: Boolean;
 
 function HorseJWT(ASecretJWT: string; AHeader: string; AExpectedAudience: TArray<string>; ARequireAudience: Boolean): THorseCallback; overload;
@@ -36,6 +38,12 @@ begin
   SessionClass := ASessionClass;
 end;
 
+function HorseJWT(ASecretJWT: string; AExpectedRoute: TArray<string>; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = []; ARequireAudience: Boolean = False): THorseCallback; overload;
+begin
+  ExpectedRoute := AExpectedRoute;
+  Result:= HorseJWT(ASecretJWT, AHeader, AExpectedAudience, ARequireAudience);
+end;
+
 procedure Middleware(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   LValidations: TJOSEConsumer;
@@ -44,6 +52,15 @@ var
   LSession: TObject;
   LJSON: TJSONObject;
 begin
+  if MatchText(THorseHackRequest(Req).GetWebRequest.PathInfo, ExpectedRoute) then
+  begin
+    try
+      Next();
+    finally
+    end;
+    exit;
+  end;
+
   LHeaderNormalize := Header;
 
   if Length(LHeaderNormalize) > 0 then
