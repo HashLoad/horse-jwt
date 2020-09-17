@@ -15,6 +15,7 @@ begin
     end);
 
   THorse.Listen(9000);
+end;
 ```
 
 Validate JWT and get custom session
@@ -31,4 +32,5 @@ begin
     end);
 
   THorse.Listen(9000);
+end;  
 ```
