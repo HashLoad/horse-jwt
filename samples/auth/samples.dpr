@@ -12,15 +12,10 @@ uses
 
 {$R *.res}
 
-var
-  App: THorse;
-
 begin
-  App := THorse.Create(9000);
+  THorse.Use(Jhonson);
 
-  App.Use(Jhonson);
-
-  App.Get('/auth',
+  THorse.Get('/auth',
     procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
     var
       LToken: TJWT;
@@ -30,11 +25,11 @@ begin
         LToken.Claims.Issuer := 'Horse';
         LToken.Claims.Subject := 'Vinicius Sanchez';
         LToken.Claims.Expiration := Now + 1;
-        Res.Send(TJSONObject.Create(TJSONPair.Create('token', TJOSE.SHA256CompactToken('EC2019', LToken))));
+        Res.Send(TJSONObject.Create(TJSONPair.Create('token', TJOSE.SHA256CompactToken('my-private-key', LToken))));
       finally
         LToken.Free;
       end;
     end);
 
-  App.Start;
+  THorse.Listen(9000);
 end.

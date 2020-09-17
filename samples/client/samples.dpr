@@ -8,19 +8,14 @@ uses
 
 {$R *.res}
 
-var
-  App: THorse;
-
 begin
-  App := THorse.Create(9000);
+  THorse.Use(HorseJWT('my-private-key'));
 
-  App.Use(HorseJWT('EC2019'));
-
-  App.Get('/ping',
+  THorse.Get('/ping',
     procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
     begin
       Res.Send('pong');
     end);
 
-  App.Start;
+  THorse.Listen(9000);
 end.
