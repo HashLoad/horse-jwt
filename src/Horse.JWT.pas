@@ -82,10 +82,10 @@ begin
         if Assigned(SessionClass) then
         begin
           LSession := SessionClass.Create;
-          TJson.JsonToObject(LSession, LJSON);
+          TJWTClaims(LSession).JSON := LJSON.Clone as TJSONObject;
         end
         else
-          LSession := LJWT.GetClaims.JSON.Clone;
+          LSession := LJSON.Clone;
 
         THorseHackRequest(Req).SetSession(LSession);
       except
