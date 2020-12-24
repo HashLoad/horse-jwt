@@ -130,7 +130,7 @@ begin
 
         if Assigned(FSessionClass) then
         begin
-          LSession := SessionClass.Create;
+          LSession := FSessionClass.Create;
           TJWTClaims(LSession).JSON := LJSON.Clone as TJSONObject;
         end
         else
