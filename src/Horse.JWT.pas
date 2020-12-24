@@ -131,10 +131,10 @@ begin
         if Assigned(FSessionClass) then
         begin
           LSession := FSessionClass.Create;
-          TJson.JsonToObject(LSession, LJSON);
+          TJWTClaims(LSession).JSON := LJSON.Clone as TJSONObject;
         end
         else
-          LSession := LJWT.GetClaims.JSON.Clone;
+          LSession := LJSON.Clone;
 
         THorseHackRequest(AHorseRequest).SetSession(LSession);
       except
