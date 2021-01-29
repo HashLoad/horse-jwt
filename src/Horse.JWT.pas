@@ -2,56 +2,54 @@ unit Horse.JWT;
 
 interface
 
-uses
-  System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, Web.HTTPApp, REST.JSON,
-  JOSE.Core.JWT, JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context,
-  Horse, Horse.Commons;
+uses System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, Web.HTTPApp, REST.JSON, JOSE.Core.JWT,
+  JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context, Horse, Horse.Commons;
 
 type
   THorseJWTConfig = class
   private
+    FIsRequireAudience: Boolean;
+    FExpectedAudience: TArray<string>;
     FIsRequiredExpirationTime: Boolean;
+    FIsRequiredIssuedAt: Boolean;
+    FIsRequiredNotBefore: Boolean;
+    FIsRequiredSubject: Boolean;
   public
     constructor Create;
-    class function New : THorseJWTConfig;
-    property IsRequiredExpirationTime : Boolean read FIsRequiredExpirationTime write FIsRequiredExpirationTime;
+    class function New: THorseJWTConfig;
+    property IsRequiredSubject: Boolean read FIsRequiredSubject write FIsRequiredSubject;
+    property IsRequiredIssuedAt: Boolean read FIsRequiredIssuedAt write FIsRequiredIssuedAt;
+    property IsRequiredNotBefore: Boolean read FIsRequiredNotBefore write FIsRequiredNotBefore;
+    property IsRequiredExpirationTime: Boolean read FIsRequiredExpirationTime write FIsRequiredExpirationTime;
+    property IsRequireAudience: Boolean read FIsRequireAudience write FIsRequireAudience;
+    property ExpectedAudience: TArray<string> read FExpectedAudience write FExpectedAudience;
   end;
 
   THorseJWTCallback = class
   private
-    { private declarations }
     FConfig : THorseJWTConfig;
     FSecretJWT: string;
     FSessionClass: TClass;
     FHeader: string;
-    FExpectedAudience: TArray<string>;
-    FRequireAudience: Boolean;
-    { protected declarations }
   public
-    { public declarations }
     constructor Create;
     class function New: THorseJWTCallback;
-    property Config : THorseJWTConfig read FConfig;
-    function SetConfig(AConfig : THorseJWTConfig) : THorseJWTCallback;
+    property Config: THorseJWTConfig read FConfig;
+    function SetConfig(AConfig: THorseJWTConfig): THorseJWTCallback;
     function SetSecretJWT(ASecretJWT: string): THorseJWTCallback;
     function SetSessionClass(ASessionClass: TClass): THorseJWTCallback;
     function SetHeader(AHeader: string): THorseJWTCallback;
-    function SetExpectedAudience(AExpectedAudience: TArray<string>): THorseJWTCallback;
-    function SetRequireAudience(ARequireAudience: Boolean): THorseJWTCallback;
     procedure Callback(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: TProc);
   end;
 
   THorseJWTManager = class
   private
-    { private declarations }
     FCallbackList: TObjectList<THorseJWTCallback>;
     class var FDefaultManager: THorseJWTManager;
     procedure SetCallbackList(const Value: TObjectList<THorseJWTCallback>);
   protected
-    { protected declarations }
     class function GetDefaultManager: THorseJWTManager; static;
   public
-    { public declarations }
     constructor Create;
     destructor Destroy; override;
     property CallbackList: TObjectList<THorseJWTCallback> read FCallbackList write SetCallbackList;
@@ -59,28 +57,29 @@ type
     class property DefaultManager: THorseJWTManager read GetDefaultManager;
   end;
 
-{$IFDEF ConditionalExpressions}
-function HorseJWT(ASecretJWT: string; AConfig:THorseJWTConfig; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = {$IF CompilerVersion >= 32.0} [] {$ELSE} nil
-{$IFEND}; ARequireAudience: Boolean = False): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = {$IF CompilerVersion >= 32.0} [] {$ELSE} nil
-{$IFEND}; ARequireAudience: Boolean = False): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'; AExpectedAudience: TArray<string> = {$IF CompilerVersion >= 32.0} [] {$ELSE} nil
-{$IFEND}; ARequireAudience: Boolean = False;AConfig:THorseJWTConfig=nil): THorseCallback; overload;
-{$ENDIF}
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AConfig: THorseJWTConfig; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AConfig: THorseJWTConfig; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
 
 implementation
 
-function HorseJWT(ASecretJWT: string; AConfig:THorseJWTConfig; AHeader: string; AExpectedAudience: TArray<string>; ARequireAudience: Boolean): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AHeader: string): THorseCallback; overload;
 begin
-  Result  :=  HorseJWT(ASecretJWT, nil, AHeader, AExpectedAudience, ARequireAudience, AConfig);
+  Result := HorseJWT(ASecretJWT, nil, nil, AHeader);
 end;
 
-function HorseJWT(ASecretJWT: string; AHeader: string; AExpectedAudience: TArray<string>; ARequireAudience: Boolean): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AConfig: THorseJWTConfig; AHeader: string): THorseCallback; overload;
 begin
-  Result := HorseJWT(ASecretJWT, nil, AHeader, AExpectedAudience, ARequireAudience, nil);
+  Result := HorseJWT(ASecretJWT, nil, AConfig, AHeader);
 end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string; AExpectedAudience: TArray<string>; ARequireAudience: Boolean;AConfig:THorseJWTConfig): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string): THorseCallback; overload;
+begin
+  Result := HorseJWT(ASecretJWT, ASessionClass, nil, AHeader);
+end;
+
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AConfig: THorseJWTConfig; AHeader: string): THorseCallback; overload;
 var
   LHorseJWTCallback: THorseJWTCallback;
 begin
@@ -90,12 +89,11 @@ begin
     .DefaultManager
     .CallbackList
     .Add(LHorseJWTCallback);
+
   Result :=
     LHorseJWTCallback
     .SetSecretJWT(ASecretJWT)
     .SetHeader(AHeader)
-    .SetExpectedAudience(AExpectedAudience)
-    .SetRequireAudience(ARequireAudience)
     .SetSessionClass(ASessionClass)
     .SetConfig(AConfig)
     .Callback;
@@ -135,11 +133,20 @@ begin
   LBuilder  :=  TJOSEConsumerBuilder
     .NewConsumer
     .SetVerificationKey(FSecretJWT)
-    .SetExpectedAudience(FRequireAudience, FExpectedAudience)
     .SetSkipVerificationKeyValidation;
 
-  if FConfig.IsRequiredExpirationTime then
-    LBuilder.SetRequireExpirationTime;
+  if Assigned(FConfig) then
+  begin
+    LBuilder.SetExpectedAudience(FConfig.IsRequireAudience, FConfig.ExpectedAudience);
+    if FConfig.IsRequiredExpirationTime then
+      LBuilder.SetRequireExpirationTime;
+    if FConfig.IsRequiredIssuedAt then
+      LBuilder.SetRequireIssuedAt;
+    if FConfig.IsRequiredNotBefore then
+      LBuilder.SetRequireNotBefore;
+    if FConfig.IsRequiredSubject then
+      LBuilder.SetRequireSubject;
+  end;
 
   LValidations := LBuilder.Build;
 
@@ -158,7 +165,7 @@ begin
         else
           LSession := LJSON.Clone;
 
-        THorseHackRequest(AHorseRequest).SetSession(LSession);
+        AHorseRequest.Session(LSession);
       except
         on E: exception do
         begin
@@ -205,22 +212,10 @@ begin
   end;
 end;
 
-function THorseJWTCallback.SetExpectedAudience(AExpectedAudience: TArray<string>): THorseJWTCallback;
-begin
-  Result := Self;
-  FExpectedAudience := AExpectedAudience;
-end;
-
 function THorseJWTCallback.SetHeader(AHeader: string): THorseJWTCallback;
 begin
   Result := Self;
   FHeader := AHeader;
-end;
-
-function THorseJWTCallback.SetRequireAudience(ARequireAudience: Boolean): THorseJWTCallback;
-begin
-  Result := Self;
-  FRequireAudience := ARequireAudience;
 end;
 
 function THorseJWTCallback.SetSecretJWT(ASecretJWT: string): THorseJWTCallback;
@@ -269,12 +264,16 @@ end;
 
 constructor THorseJWTConfig.Create;
 begin
-  FIsRequiredExpirationTime :=  True;
+  FIsRequireAudience := False;
+  FIsRequiredExpirationTime := False;
+  FIsRequiredIssuedAt := False;
+  FIsRequiredNotBefore := False;
+  FIsRequiredSubject := False;
 end;
 
 class function THorseJWTConfig.New: THorseJWTConfig;
 begin
-  Result  :=  Self.Create;
+  Result := Self.Create;
 end;
 
 end.

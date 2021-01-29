@@ -6,8 +6,8 @@
 	"mainsrc": "./",
 	"projects": [],
 	"dependencies": {
-		"github.com/HashLoad/horse": "^2.0.0",
-		"github.com/HashLoad/jhonson": "^1.0.3",
-		"https://github.com/paolo-rossi/delphi-jose-jwt": "^v2.5.0"
+		"github.com/hashload/horse": "^2.0.8",
+		"github.com/hashload/jhonson": "^1.1.1",
+		"github.com/paolo-rossi/delphi-jose-jwt": "^v2.5.2"
 	}
 }
