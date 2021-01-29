@@ -204,10 +204,10 @@ function THorseJWTCallback.SetConfig(
 begin
   Result  :=  Self;
 
-  if AConfig <> nil then
+  if Assigned(AConfig) then
   begin
-	if Assigned(FConfig) then
-	  FConfig.Free;
+	  if Assigned(FConfig) and (FConfig <> AConfig) then
+	    FConfig.Free;
     FConfig :=  AConfig;
   end;
 end;
