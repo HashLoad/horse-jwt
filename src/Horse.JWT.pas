@@ -199,16 +199,14 @@ begin
   Result := THorseJWTCallback.Create;
 end;
 
-function THorseJWTCallback.SetConfig(
-  AConfig: THorseJWTConfig): THorseJWTCallback;
+function THorseJWTCallback.SetConfig(AConfig: THorseJWTConfig): THorseJWTCallback;
 begin
-  Result  :=  Self;
-
+  Result := Self;
   if Assigned(AConfig) then
   begin
-	  if Assigned(FConfig) and (FConfig <> AConfig) then
-	    FConfig.Free;
-    FConfig :=  AConfig;
+    if Assigned(FConfig) and (FConfig <> AConfig) then
+      FConfig.Free;
+    FConfig := AConfig;
   end;
 end;
 
