@@ -33,6 +33,7 @@ type
     FHeader: string;
   public
     constructor Create;
+    destructor Destroy; override;
     class function New: THorseJWTCallback;
     property Config: THorseJWTConfig read FConfig;
     function SetConfig(AConfig: THorseJWTConfig): THorseJWTCallback;
@@ -103,7 +104,7 @@ end;
 
 procedure THorseJWTCallback.Callback(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: TProc);
 var
-  LBuilder : IJOSEConsumerBuilder;
+  LBuilder: IJOSEConsumerBuilder;
   LValidations: TJOSEConsumer;
   LJWT: TJOSEContext;
   LToken, LHeaderNormalize: string;
@@ -191,7 +192,14 @@ end;
 
 constructor THorseJWTCallback.Create;
 begin
-  FConfig :=  THorseJWTConfig.Create;
+  FConfig := THorseJWTConfig.Create;
+end;
+
+destructor THorseJWTCallback.Destroy;
+begin
+  if Assigned(FConfig) then
+    FConfig.Free;
+  inherited;
 end;
 
 class function THorseJWTCallback.New: THorseJWTCallback;
