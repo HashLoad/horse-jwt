@@ -152,7 +152,15 @@ begin
   LValidations := LBuilder.Build;
 
   try
-    LJWT := TJOSEContext.Create(LToken, TJWTClaims);
+    try
+      LJWT := TJOSEContext.Create(LToken, TJWTClaims);
+    except
+      on E: exception do
+      begin
+        AHorseResponse.Send('Invalid token authorization').Status(THTTPStatus.Unauthorized);
+        raise EHorseCallbackInterrupted.Create;
+      end;
+    end;
     try
       try
         LValidations.ProcessContext(LJWT);
