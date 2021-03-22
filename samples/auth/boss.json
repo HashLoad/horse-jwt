@@ -8,6 +8,6 @@
 	"dependencies": {
 		"github.com/hashload/horse": "^2.0.8",
 		"github.com/hashload/jhonson": "^1.1.1",
-		"github.com/paolo-rossi/delphi-jose-jwt": "^v2.5.2"
+		"github.com/paolo-rossi/delphi-jose-jwt": "^v3.0.0"
 	}
 }

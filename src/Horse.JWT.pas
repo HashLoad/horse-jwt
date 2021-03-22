@@ -105,7 +105,7 @@ end;
 procedure THorseJWTCallback.Callback(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: TProc);
 var
   LBuilder: IJOSEConsumerBuilder;
-  LValidations: TJOSEConsumer;
+  LValidations: IJOSEConsumer;
   LJWT: TJOSEContext;
   LToken, LHeaderNormalize: string;
   LSession: TObject;
@@ -152,49 +152,46 @@ begin
   LValidations := LBuilder.Build;
 
   try
+    LJWT := TJOSEContext.Create(LToken, TJWTClaims);
+  except
+    on E: exception do
+    begin
+      AHorseResponse.Send('Invalid token authorization').Status(THTTPStatus.Unauthorized);
+      raise EHorseCallbackInterrupted.Create;
+    end;
+  end;
+
+  try
     try
-      LJWT := TJOSEContext.Create(LToken, TJWTClaims);
+      LValidations.ProcessContext(LJWT);
+      LJSON := LJWT.GetClaims.JSON;
+
+      if Assigned(FSessionClass) then
+      begin
+        LSession := FSessionClass.Create;
+        TJWTClaims(LSession).JSON := LJSON.Clone as TJSONObject;
+      end
+      else
+        LSession := LJSON.Clone;
+
+      AHorseRequest.Session(LSession);
     except
       on E: exception do
       begin
-        AHorseResponse.Send('Invalid token authorization').Status(THTTPStatus.Unauthorized);
+        if E.InheritsFrom(EHorseCallbackInterrupted) then
+          raise EHorseCallbackInterrupted(E);
+        AHorseResponse.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
         raise EHorseCallbackInterrupted.Create;
       end;
     end;
     try
-      try
-        LValidations.ProcessContext(LJWT);
-        LJSON := LJWT.GetClaims.JSON;
-
-        if Assigned(FSessionClass) then
-        begin
-          LSession := FSessionClass.Create;
-          TJWTClaims(LSession).JSON := LJSON.Clone as TJSONObject;
-        end
-        else
-          LSession := LJSON.Clone;
-
-        AHorseRequest.Session(LSession);
-      except
-        on E: exception do
-        begin
-          if E.InheritsFrom(EHorseCallbackInterrupted) then
-            raise EHorseCallbackInterrupted(E);
-          AHorseResponse.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
-          raise EHorseCallbackInterrupted.Create;
-        end;
-      end;
-      try
-        ANext();
-      finally
-        if Assigned(LSession) then
-          LSession.Free;
-      end;
+      ANext();
     finally
-      LJWT.Free;
+      if Assigned(LSession) then
+        LSession.Free;
     end;
   finally
-    LValidations.Free;
+    LJWT.Free;
   end;
 end;
 

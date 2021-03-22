@@ -7,6 +7,6 @@
 	"projects": [],
 	"dependencies": {
 		"github.com/hashload/horse": "^2.0.8",
-		"github.com/paolo-rossi/delphi-jose-jwt": "^v2.5.2"
+		"github.com/paolo-rossi/delphi-jose-jwt": "^v3.0.0"
 	}
 }
