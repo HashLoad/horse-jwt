@@ -8,12 +8,14 @@ uses System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, 
 type
   THorseJWTConfig = class
   private
+    FSkipRoutes: TArray<string>;
     FIsRequireAudience: Boolean;
     FExpectedAudience: TArray<string>;
     FIsRequiredExpirationTime: Boolean;
     FIsRequiredIssuedAt: Boolean;
     FIsRequiredNotBefore: Boolean;
     FIsRequiredSubject: Boolean;
+    procedure SetSkipRoutes(const ARoutes: TArray<string>);
   public
     constructor Create;
     class function New: THorseJWTConfig;
@@ -23,6 +25,7 @@ type
     property IsRequiredExpirationTime: Boolean read FIsRequiredExpirationTime write FIsRequiredExpirationTime;
     property IsRequireAudience: Boolean read FIsRequireAudience write FIsRequireAudience;
     property ExpectedAudience: TArray<string> read FExpectedAudience write FExpectedAudience;
+    property SkipRoutes: TArray<string> read FSkipRoutes write SetSkipRoutes;
   end;
 
   THorseJWTCallback = class
@@ -64,6 +67,8 @@ function HorseJWT(ASecretJWT: string; AConfig: THorseJWTConfig; AHeader: string 
 function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
 
 implementation
+
+uses System.StrUtils;
 
 function HorseJWT(ASecretJWT: string; AHeader: string): THorseCallback; overload;
 begin
@@ -111,6 +116,12 @@ var
   LSession: TObject;
   LJSON: TJSONObject;
 begin
+  if MatchText(AHorseRequest.RawWebRequest.PathInfo, FConfig.SkipRoutes) then
+  begin
+    ANext();
+    Exit;
+  end;
+
   LHeaderNormalize := FHeader;
 
   if Length(LHeaderNormalize) > 0 then
@@ -285,6 +296,16 @@ end;
 class function THorseJWTConfig.New: THorseJWTConfig;
 begin
   Result := Self.Create;
+end;
+
+procedure THorseJWTConfig.SetSkipRoutes(const ARoutes: TArray<string>);
+var
+  I: Integer;
+begin
+  FSkipRoutes := ARoutes;
+  for I := 0 to Pred(Length(FSkipRoutes)) do
+    if Copy(Trim(FSkipRoutes[I]), 1, 1) <> '/' then
+      FSkipRoutes[I] := '/' + FSkipRoutes[I];
 end;
 
 end.
