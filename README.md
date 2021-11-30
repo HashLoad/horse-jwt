@@ -9,7 +9,7 @@ $ boss install github.com/hashload/horse-jwt
 or
 
 ``` sh
-$ boss install horse-jwt
+boss install horse-jwt
 ```
 
 ## Usage
