@@ -148,7 +148,7 @@ var
     else if (LJWT.JOSE.alg = 'HS512') then
       LHMAC := THashFactory.THMAC.CreateHMAC(THashFactory.TCrypto.CreateSHA2_512)
     else
-      raise Exception.Create('[aud] not implemented');
+      raise Exception.Create('[alg] not implemented');
 
     LHMAC.Key := TConverters.ConvertStringToBytes(UTF8Encode(SecretJWT), TEncoding.UTF8);
     LSignCalc := HexToAscii(TConverters.ConvertBytesToHexString(LHMAC.ComputeString(UTF8Encode(Trim(Copy(LToken,1,NPos('.',LToken,2)-1))), TEncoding.UTF8).GetBytes,False));
