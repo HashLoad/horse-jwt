@@ -17,6 +17,13 @@
 			"artifacts": {},
 			"failed": false,
 			"changed": false
-		}
+		},
+		"github.com/andre-djsystem/HashLib4Pascal": {
+			"name": "HashLib4Pascal",
+			"version": "v1.0.0",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		}		
 	}
 }

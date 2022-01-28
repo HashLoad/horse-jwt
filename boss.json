@@ -8,5 +8,6 @@
 	"dependencies": {
 		"github.com/hashload/horse": "^2.0.8",
 		"github.com/paolo-rossi/delphi-jose-jwt": "^v3.0.0"
+		"github.com/andre-djsystem/HashLib4Pascal": "^v1.0.0"
 	}
 }
