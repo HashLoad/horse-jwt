@@ -9,9 +9,7 @@ interface
 uses
   {$IF DEFINED(FPC)}
   Generics.Collections, Classes, fpjson, SysUtils, HTTPDefs, fpjwt, Base64, DateUtils,
-  HlpIHashInfo,
-  HlpConverters,
-  HlpHashFactory,
+  HlpIHashInfo, HlpConverters, HlpHashFactory,
   {$ELSE}
   System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, Web.HTTPApp, REST.JSON, JOSE.Core.JWT,
   JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context,
@@ -68,8 +66,7 @@ var
   SessionClass: TClass;
   Header: string;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass;
-  AConfig: THorseJWTConfig; AHeader: string): THorseCallback;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AConfig: THorseJWTConfig; AHeader: string): THorseCallback;
 begin
   SecretJWT := ASecretJWT;
   SessionClass := ASessionClass;
@@ -78,8 +75,7 @@ begin
   Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
 end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string
-  ): THorseCallback;
+function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string): THorseCallback;
 begin
   SecretJWT := ASecretJWT;
   SessionClass := ASessionClass;
@@ -87,8 +83,7 @@ begin
   Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
 end;
 
-function HorseJWT(ASecretJWT: string; AConfig: THorseJWTConfig; AHeader: string
-  ): THorseCallback;
+function HorseJWT(ASecretJWT: string; AConfig: THorseJWTConfig; AHeader: string): THorseCallback;
 begin
   SecretJWT := ASecretJWT;
   Config := AConfig;
@@ -117,24 +112,24 @@ var
   LSession: TObject;
   LJSON: TJSONObject;
   {$IF DEFINED(FPC)}
-  function HexToAscii(const HexStr : String) : AnsiString ; //ACBrUtil
+  function HexToAscii(const HexStr: string): AnsiString;
   Var
-    B   : Byte ;
-    Cmd : String ;
-    I, L: Integer ;
+    B: Byte;
+    Cmd: string;
+    I, L: Integer;
   begin
-    Result := '' ;
-    Cmd    := Trim(HexStr);
-    I      := 1 ;
-    L      := Length(Cmd) ;
+    Result := '';
+    Cmd := Trim(HexStr);
+    I := 1;
+    L := Length(Cmd);
 
     while I < L do
     begin
-       B := StrToInt('$' + copy(Cmd, I, 2)) ;
-       Result := Result + AnsiChar(chr(B)) ;
-       Inc( I, 2) ;
-    end ;
-  end ;
+       B := StrToInt('$' + copy(Cmd, I, 2));
+       Result := Result + AnsiChar(chr(B));
+       Inc( I, 2);
+    end;
+  end;
 
   function ValidateSignature: Boolean;
   var

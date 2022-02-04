@@ -1,0 +1,12 @@
+{
+	"name": "client",
+	"description": "",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./src",
+	"projects": [],
+	"dependencies": {
+		"github.com/andre-djsystem/hashlib4pascal": "^1.0.0",
+		"github.com/hashload/horse": "^v2.0.14"
+	}
+}
