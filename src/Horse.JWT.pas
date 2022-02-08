@@ -8,7 +8,7 @@ interface
 
 uses
   {$IF DEFINED(FPC)}
-  Generics.Collections, Classes, fpjson, SysUtils, HTTPDefs, fpjwt, Base64, DateUtils,
+  Generics.Collections, Classes, fpjson, SysUtils, HTTPDefs, fpjwt, Base64, DateUtils, jsonparser,
   HlpIHashInfo, HlpConverters, HlpHashFactory,
   {$ELSE}
   System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, Web.HTTPApp, REST.JSON, JOSE.Core.JWT,
@@ -211,7 +211,7 @@ begin
     if (Trim(LJWT.Signature) = EmptyStr) or (not ValidateSignature) then
       raise Exception.Create('Invalid signature');
 
-    if (LJWT.Claims.exp <> 0) and (LJWT.Claims.exp > DateTimeToUnix(Now)) then
+    if (LJWT.Claims.exp <> 0) and (LJWT.Claims.exp < DateTimeToUnix(Now)) then
       raise  Exception.Create(Format(
             'The JWT is no longer valid - the evaluation time [%s] is on or after the Expiration Time [exp=%s]',
             [DateToISO8601(Now, False), DateToISO8601(LJWT.Claims.exp, False)]));

@@ -1,29 +1,30 @@
 {
-	"hash": "445774d05b3e1b873cfcdb89032b3e1f",
-	"updated": "2019-10-29T12:23:27.0587203-03:00",
+	"hash": "d41d8cd98f00b204e9800998ecf8427e",
+	"updated": "2022-02-08T14:16:13.4097104-03:00",
 	"installedModules": {
+		"github.com/andre-djsystem/hashlib4pascal": {
+			"name": "hashlib4pascal",
+			"version": "1.0.0",
+			"hash": "8528036224699ab509c7d8f31d691ffb",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
 		"github.com/hashload/horse": {
 			"name": "horse",
-			"version": "2.0.13",
-			"hash": "32daa5a81f115ecc285cbbbbdbcddcea",
+			"version": "v2.0.14",
+			"hash": "38c6bebdc7b9712d6e5856d299289a26",
 			"artifacts": {},
 			"failed": false,
 			"changed": false
 		},
 		"github.com/paolo-rossi/delphi-jose-jwt": {
 			"name": "delphi-jose-jwt",
-			"version": "v3.0.0",
-			"hash": "e07d23afdc06adef34b7fbbabd97ce83",
+			"version": "v3.0.3",
+			"hash": "d8b6ff80aff10e83d87219f45fa43ffb",
 			"artifacts": {},
 			"failed": false,
 			"changed": false
-		},
-		"github.com/andre-djsystem/HashLib4Pascal": {
-			"name": "HashLib4Pascal",
-			"version": "v1.0.0",
-			"artifacts": {},
-			"failed": false,
-			"changed": false
-		}		
+		}
 	}
 }

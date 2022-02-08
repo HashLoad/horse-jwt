@@ -76,7 +76,7 @@
         <UsingDelphiRTL>true</UsingDelphiRTL>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
-        <DCC_UnitSearchPath>$(Horse);$(DCC_UnitSearchPath);modules\.dcp;modules\.dcu;modules;modules\delphi-jose-jwt\Source\Common;modules\delphi-jose-jwt\Source\JOSE;modules\horse\src;modules\jhonson\src</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(Horse);modules\.dcp;modules\.dcu;modules;modules\delphi-jose-jwt\Source\Common;modules\delphi-jose-jwt\Source\JOSE;modules\horse\src;modules\jhonson\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_Framework>VCL;$(DCC_Framework)</DCC_Framework>
         <SanitizedProjectName>samples</SanitizedProjectName>
     </PropertyGroup>
