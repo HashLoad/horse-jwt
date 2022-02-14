@@ -180,7 +180,7 @@ begin
     raise EHorseCallbackInterrupted.Create;
   end;
 
-  LToken := LToken.Replace('bearer ', '', [rfIgnoreCase]);
+  LToken := Trim(LToken.Replace('bearer', '', [rfIgnoreCase]));
 
   {$IFNDEF FPC}
   LBuilder  :=  TJOSEConsumerBuilder
