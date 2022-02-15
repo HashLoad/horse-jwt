@@ -1,18 +1,56 @@
 # Horse-JWT
+<b>Horse-JWT</b> is a official middleware for generate and validate <a href="https://jwt.io/">JWT</a> in APIs developed with the <a href="https://github.com/HashLoad/horse">Horse</a> framework.
+<br>We created a channel on Telegram for questions and support:<br><br>
+<a href="https://t.me/hashload">
+  <img src="https://img.shields.io/badge/telegram-join%20channel-7289DA?style=flat-square">
+</a>
 
-Basic JWT middleware for Horse.
+## ⭕ Prerequisites
+##### Delphi
+- [**delphi-jose-jwt**](https://github.com/paolo-rossi/delphi-jose-jwt) - JOSE is a standard that provides a general approach to the signing and encryption of any content.
 
-### For install in your project using [boss](https://github.com/HashLoad/boss):
-``` sh
-$ boss install github.com/hashload/horse-jwt
-```
-or
+##### Lazarus
+- [**hashlib4pascal**](https://github.com/andre-djsystem/hashlib4pascal) - is an Object Pascal hashing library released under the permissive MIT License which provides an easy to use interface for computing hashes and checksums of data. It also supports state based (incremental) hashing.
 
+
+## ⚙️ Installation
+Installation is done using the [`boss install`](https://github.com/HashLoad/boss) command:
 ``` sh
 boss install horse-jwt
 ```
+If you choose to install manually, simply add the following folders to your project, in *Project > Options > Resource Compiler > Directories and Conditionals > Include file search path*
 
-## Usage
+##### Delphi
+```
+../horse-jwt/src
+../delphi-jose-jwt/Source/Common
+../delphi-jose-jwt/Source/JOSE
+```
+
+##### Lazarus
+```
+../horse-jwt/src
+../HashLib/src/Base
+../HashLib/src/Checksum
+../HashLib/src/Crypto
+../HashLib/src/Hash128
+../HashLib/src/Hash32
+../HashLib/src/Hash64
+../HashLib/src/Include
+../HashLib/src/Interfaces
+../HashLib/src/KDF
+../HashLib/src/NullDigest
+../HashLib/src/Nullable
+../HashLib/src/Packages
+../HashLib/src/Utils
+```
+
+## ✔️ Compatibility
+This middleware is compatible with projects developed in:
+- [X] Delphi
+- [X] Lazarus
+
+## ⚡️ Quickstart Delphi
 
 #### All requests need token authorization.
 
@@ -44,11 +82,13 @@ begin
       Res.Send('pong');
     end);
 
-  THorse.Get('private', HorseJWT('MY-PASSWORD'),
-    procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
-    begin
-      Res.Send('route private');
-    end);
+  THorse
+    .AddCallback(HorseJWT('MY-PASSWORD'))
+    .Get('private',
+      procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+      begin
+        Res.Send('route private');
+      end);
 
   THorse.Listen(9000);
 end.
@@ -298,3 +338,65 @@ begin
   THorse.Listen(9000);
 end.
 ```
+
+## ⚡️ Quickstart Lazarus
+
+#### All requests need token authorization.
+
+```delphi
+{$MODE DELPHI}{$H+}
+
+uses
+  {$IFDEF UNIX}{$IFDEF UseCThreads}
+  cthreads,
+  {$ENDIF}{$ENDIF}
+  Horse, Horse.JWT, SysUtils;
+
+procedure GetPing(Req: THorseRequest; Res: THorseResponse; Next: TNextProc);
+begin
+  Res.Send('Pong');
+end;
+
+begin
+  THorse.Use(HorseJWT('my-private-key'));
+
+  THorse.Get('/ping', GetPing);
+
+  THorse.Listen(9000);
+end.
+```
+
+#### Some routes require authentication
+
+```delphi
+{$MODE DELPHI}{$H+}
+
+uses
+  {$IFDEF UNIX}{$IFDEF UseCThreads}
+  cthreads,
+  {$ENDIF}{$ENDIF}
+  Horse, Horse.JWT, SysUtils;
+
+procedure GetPing(Req: THorseRequest; Res: THorseResponse; Next: TNextProc);
+begin
+  Res.Send('Pong');
+end;
+
+procedure GetPrivate(Req: THorseRequest; Res: THorseResponse; Next: TNextProc);
+begin
+  Res.Send('route private');
+end;
+
+begin
+  THorse.Get('/ping', GetPing);
+  
+  THorse
+    .AddCallback(HorseJWT('my-private-key'))
+    .Get('private', GetPrivate);
+
+  THorse.Listen(9000);
+end.
+```
+
+## ⚠️ License
+`horse-jwt` is free and open-source middleware licensed under the [MIT License](https://github.com/HashLoad/horse-jwt/blob/master/LICENSE).
