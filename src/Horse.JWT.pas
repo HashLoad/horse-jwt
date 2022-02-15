@@ -1,29 +1,49 @@
 unit Horse.JWT;
 
 {$IF DEFINED(FPC)}
-{$MODE DELPHI}{$H+}
+  {$MODE DELPHI}{$H+}
 {$ENDIF}
 
 interface
 
 uses
-  {$IF DEFINED(FPC)}
+{$IF DEFINED(FPC)}
   Generics.Collections, Classes, fpjson, SysUtils, HTTPDefs, fpjwt, Base64, DateUtils, jsonparser,
   HlpIHashInfo, HlpConverters, HlpHashFactory,
-  {$ELSE}
+{$ELSE}
   System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, Web.HTTPApp, REST.JSON, JOSE.Core.JWT,
   JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context,
-  {$ENDIF}
+{$ENDIF}
   Horse, Horse.Commons;
 
 type
   IHorseJWTConfig = interface
   ['{71A29190-1528-4E4D-932D-86094DDA9B4A}']
-     procedure SetSkipRoutes(const ARoutes: TArray<string>);
+     function SkipRoutes: TArray<string>; overload;
+     function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
+     function Header: string; overload;
+     function Header(const AValue: string): IHorseJWTConfig; overload;
+     function IsRequiredSubject: Boolean; overload;
+     function IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig; overload;
+     function IsRequiredIssuedAt: Boolean; overload;
+     function IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig; overload;
+     function IsRequiredNotBefore: Boolean; overload;
+     function IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig; overload;
+     function IsRequiredExpirationTime: Boolean; overload;
+     function IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig; overload;
+     function IsRequireAudience: Boolean; overload;
+     function IsRequireAudience(const AValue: Boolean): IHorseJWTConfig; overload;
+     function ExpectedAudience: TArray<string>; overload;
+     function ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig; overload;
+     function SessionClass: TClass; overload;
+     function SessionClass(const AValue: TClass): IHorseJWTConfig; overload;
   end;
+
+  { THorseJWTConfig }
 
   THorseJWTConfig = class(TInterfacedObject, IHorseJWTConfig)
   private
+    FHeader: string;
     FSkipRoutes: TArray<string>;
     FIsRequireAudience: Boolean;
     FExpectedAudience: TArray<string>;
@@ -31,87 +51,70 @@ type
     FIsRequiredIssuedAt: Boolean;
     FIsRequiredNotBefore: Boolean;
     FIsRequiredSubject: Boolean;
-    procedure SetSkipRoutes(const ARoutes: TArray<string>);
+    FSessionClass: TClass;
+    function SkipRoutes: TArray<string>; overload;
+    function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
+    function Header: string; overload;
+    function Header(const AValue: string): IHorseJWTConfig; overload;
+    function IsRequiredSubject: Boolean; overload;
+    function IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredIssuedAt: Boolean; overload;
+    function IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredNotBefore: Boolean; overload;
+    function IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredExpirationTime: Boolean; overload;
+    function IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequireAudience: Boolean; overload;
+    function IsRequireAudience(const AValue: Boolean): IHorseJWTConfig; overload;
+    function ExpectedAudience: TArray<string>; overload;
+    function ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig; overload;
+    function SessionClass: TClass; overload;
+    function SessionClass(const AValue: TClass): IHorseJWTConfig; overload;
   public
     constructor Create;
-    class function New: THorseJWTConfig;
-    property IsRequiredSubject: Boolean read FIsRequiredSubject write FIsRequiredSubject;
-    property IsRequiredIssuedAt: Boolean read FIsRequiredIssuedAt write FIsRequiredIssuedAt;
-    property IsRequiredNotBefore: Boolean read FIsRequiredNotBefore write FIsRequiredNotBefore;
-    property IsRequiredExpirationTime: Boolean read FIsRequiredExpirationTime write FIsRequiredExpirationTime;
-    property IsRequireAudience: Boolean read FIsRequireAudience write FIsRequireAudience;
-    property ExpectedAudience: TArray<string> read FExpectedAudience write FExpectedAudience;
-    property SkipRoutes: TArray<string> read FSkipRoutes write SetSkipRoutes;
+    class function New: IHorseJWTConfig;
   end;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AConfig: THorseJWTConfig; AHeader: string = 'authorization'): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string = 'authorization'): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; AConfig: THorseJWTConfig; AHeader: string = 'authorization'): THorseCallback; overload;
-function HorseJWT(ASecretJWT: string; AHeader: string = 'authorization'): THorseCallback; overload;
+function HorseJWT(ASecretJWT: string; AConfig: IHorseJWTConfig = nil): THorseCallback;
 procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
 
 implementation
 
 uses
-  {$IF DEFINED(FPC)}
+{$IF DEFINED(FPC)}
   StrUtils
-  {$ELSE}
+{$ELSE}
   System.StrUtils
-  {$ENDIF}
+{$ENDIF}
   ;
 
 var
-  Config: THorseJWTConfig;
+  Config: IHorseJWTConfig;
   SecretJWT: string;
-  SessionClass: TClass;
-  Header: string;
 
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AConfig: THorseJWTConfig; AHeader: string): THorseCallback;
-begin
-  SecretJWT := ASecretJWT;
-  SessionClass := ASessionClass;
-  Config := AConfig;
-  Header := AHeader;
-  Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
-end;
-
-function HorseJWT(ASecretJWT: string; ASessionClass: TClass; AHeader: string): THorseCallback;
-begin
-  SecretJWT := ASecretJWT;
-  SessionClass := ASessionClass;
-  Header := AHeader;
-  Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
-end;
-
-function HorseJWT(ASecretJWT: string; AConfig: THorseJWTConfig; AHeader: string): THorseCallback;
+function HorseJWT(ASecretJWT: string; AConfig: IHorseJWTConfig): THorseCallback;
 begin
   SecretJWT := ASecretJWT;
   Config := AConfig;
-  Header := AHeader;
-  Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
-end;
-
-function HorseJWT(ASecretJWT: string; AHeader: string): THorseCallback; overload;
-begin
-  SecretJWT := ASecretJWT;
-  Header := AHeader;
+  if not Assigned(AConfig) then
+    Config := THorseJWTConfig.New;
   Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
 end;
 
 procedure Middleware(AHorseRequest: THorseRequest;
-  AHorseResponse: THorseResponse; ANext:  {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
+  AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
 var
-  {$IF DEFINED(FPC)}
+{$IF DEFINED(FPC)}
   LJWT: TJWT;
-  {$ELSE}
+{$ELSE}
   LBuilder: IJOSEConsumerBuilder;
   LValidations: IJOSEConsumer;
   LJWT: TJOSEContext;
-  {$ENDIF}
+{$ENDIF}
   LToken, LHeaderNormalize: string;
   LSession: TObject;
   LJSON: TJSONObject;
-  {$IF DEFINED(FPC)}
+{$IF DEFINED(FPC)}
   function HexToAscii(const HexStr: string): AnsiString;
   Var
     B: Byte;
@@ -151,24 +154,21 @@ var
 
     Result := (LJWT.Signature = LSignCalc);
   end;
-  {$ENDIF}
+{$ENDIF}
 begin
-  if Assigned(Config)then
+  if MatchText(AHorseRequest.RawWebRequest.PathInfo, Config.SkipRoutes) then
   begin
-    if MatchText(AHorseRequest.RawWebRequest.PathInfo, Config.SkipRoutes) then
-    begin
-      ANext();
-      Exit;
-    end;
+    ANext();
+    Exit;
   end;
 
-  LHeaderNormalize := Header;
+  LHeaderNormalize := Config.Header;
 
   if Length(LHeaderNormalize) > 0 then
     LHeaderNormalize[1] := UpCase(LHeaderNormalize[1]);
 
-  LToken := AHorseRequest.Headers[Header];
-  if LToken.Trim.IsEmpty and not AHorseRequest.Query.TryGetValue(Header, LToken) and not AHorseRequest.Query.TryGetValue(LHeaderNormalize, LToken) then
+  LToken := AHorseRequest.Headers[Config.Header];
+  if LToken.Trim.IsEmpty and not AHorseRequest.Query.TryGetValue(Config.Header, LToken) and not AHorseRequest.Query.TryGetValue(LHeaderNormalize, LToken) then
   begin
     AHorseResponse.Send('Token not found').Status(THTTPStatus.Unauthorized);
     raise EHorseCallbackInterrupted.Create;
@@ -260,9 +260,9 @@ begin
       LJSON := LJWT.GetClaims.JSON;
       {$ENDIF}
 
-      if Assigned(SessionClass) then
+      if Assigned(Config.SessionClass) then
       begin
-        LSession := SessionClass.Create;
+        LSession := Config.SessionClass.Create;
         {$IF DEFINED(FPC)}
         TClaims(LSession).LoadFromJSON(LJSON);
         {$ELSE}
@@ -301,21 +301,12 @@ end;
 
 { THorseJWTConfig }
 
-constructor THorseJWTConfig.Create;
+function THorseJWTConfig.SkipRoutes: TArray<string>;
 begin
-  FIsRequireAudience := False;
-  FIsRequiredExpirationTime := False;
-  FIsRequiredIssuedAt := False;
-  FIsRequiredNotBefore := False;
-  FIsRequiredSubject := False;
+  Result := FSkipRoutes;
 end;
 
-class function THorseJWTConfig.New: THorseJWTConfig;
-begin
-  Result := Self.Create;
-end;
-
-procedure THorseJWTConfig.SetSkipRoutes(const ARoutes: TArray<string>);
+function THorseJWTConfig.SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig;
 var
   I: Integer;
 begin
@@ -323,6 +314,110 @@ begin
   for I := 0 to Pred(Length(FSkipRoutes)) do
     if Copy(Trim(FSkipRoutes[I]), 1, 1) <> '/' then
       FSkipRoutes[I] := '/' + FSkipRoutes[I];
+  Result := Self;
+end;
+
+function THorseJWTConfig.Header: string;
+begin
+  Result := FHeader;
+end;
+
+function THorseJWTConfig.Header(const AValue: string): IHorseJWTConfig;
+begin
+  FHeader := AValue;
+  Result := Self;
+end;
+
+function THorseJWTConfig.IsRequiredSubject: Boolean;
+begin
+  Result := FIsRequiredSubject;
+end;
+
+function THorseJWTConfig.IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig;
+begin
+  FIsRequiredSubject := AValue;
+  Result := Self;
+end;
+
+function THorseJWTConfig.IsRequiredIssuedAt: Boolean;
+begin
+  Result := FIsRequiredIssuedAt;
+end;
+
+function THorseJWTConfig.IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig;
+begin
+  FIsRequiredIssuedAt := AValue;
+  Result := Self;
+end;
+
+function THorseJWTConfig.IsRequiredNotBefore: Boolean;
+begin
+  Result := FIsRequiredNotBefore;
+end;
+
+function THorseJWTConfig.IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig;
+begin
+  FIsRequiredNotBefore := AValue;
+  Result := Self;
+end;
+
+function THorseJWTConfig.IsRequiredExpirationTime: Boolean;
+begin
+  Result := FIsRequiredExpirationTime;
+end;
+
+function THorseJWTConfig.IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig;
+begin
+  FIsRequiredExpirationTime := AValue;
+  Result := Self;
+end;
+
+function THorseJWTConfig.IsRequireAudience: Boolean;
+begin
+  Result := FIsRequireAudience;
+end;
+
+function THorseJWTConfig.IsRequireAudience(const AValue: Boolean): IHorseJWTConfig;
+begin
+  FIsRequireAudience := AValue;
+  Result := Self;
+end;
+
+function THorseJWTConfig.ExpectedAudience: TArray<string>;
+begin
+  Result := FExpectedAudience;
+end;
+
+function THorseJWTConfig.ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig;
+begin
+  FExpectedAudience := AValue;
+  Result := Self;
+end;
+
+function THorseJWTConfig.SessionClass: TClass;
+begin
+  Result := FSessionClass;
+end;
+
+function THorseJWTConfig.SessionClass(const AValue: TClass): IHorseJWTConfig;
+begin
+  FSessionClass := AValue;
+  Result := Self;
+end;
+
+constructor THorseJWTConfig.Create;
+begin
+  FHeader := 'authorization';
+  FIsRequireAudience := False;
+  FIsRequiredExpirationTime := False;
+  FIsRequiredIssuedAt := False;
+  FIsRequiredNotBefore := False;
+  FIsRequiredSubject := False;
+end;
+
+class function THorseJWTConfig.New: IHorseJWTConfig;
+begin
+  Result := Self.Create;
 end;
 
 end.
