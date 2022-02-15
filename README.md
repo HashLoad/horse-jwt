@@ -249,21 +249,23 @@ uses
   System.SysUtils;
 
 begin
-  THorse.Get('ping', HorseJWT('MY-PASSWORD', TMyClaims), // Add custom payload class
-    procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
-    var
-      LClaims: TMyClaims;
-      LId, LName, LEmail: string;
-    begin
-      // Get the Payload information from the Session
-      LClaims := Req.Session<TMyClaims>;
+  THorse
+    .AddCallback(HorseJWT('MY-PASSWORD', TMyClaims)) // Add custom payload class
+    .Get('ping', 
+      procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+      var
+        LClaims: TMyClaims;
+        LId, LName, LEmail: string;
+      begin
+        // Get the Payload information from the Session
+        LClaims := Req.Session<TMyClaims>;
 
-      LId := LClaims.Id;
-      LName := LClaims.Name;
-      LEmail := LClaims.Email;
+        LId := LClaims.Id;
+        LName := LClaims.Name;
+        LEmail := LClaims.Email;
 
-      Res.Send(Format('I’m %s and this is my email %s',[LName, LEmail]));
-    end);
+        Res.Send(Format('I’m %s and this is my email %s',[LName, LEmail]));
+      end);
 
   THorse.Listen(9000);
 end.
@@ -319,21 +321,23 @@ begin
     end);
 
   // Route private
-  THorse.Get('private', HorseJWT('MY-PASSWORD', TMyClaims), // Add custom payload class
-    procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
-    var
-      LClaims: TMyClaims;
-      LId, LName, LEmail: string;
-    begin
-      // Get the Payload information from the Session
-      LClaims := Req.Session<TMyClaims>;
+  THorse
+    .AddCallback(HorseJWT('MY-PASSWORD', TMyClaims)) // Add custom payload class
+    .Get('private', 
+      procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+      var
+        LClaims: TMyClaims;
+        LId, LName, LEmail: string;
+      begin
+        // Get the Payload information from the Session
+        LClaims := Req.Session<TMyClaims>;
 
-      LId := LClaims.Id;
-      LName := LClaims.Name;
-      LEmail := LClaims.Email;
+        LId := LClaims.Id;
+        LName := LClaims.Name;
+        LEmail := LClaims.Email;
 
-      Res.Send(Format('I’m %s and this is my email %s', [LName, LEmail]));
-    end);
+        Res.Send(Format('I’m %s and this is my email %s', [LName, LEmail]));
+      end);
 
   THorse.Listen(9000);
 end.
