@@ -111,6 +111,7 @@ var
   LValidations: IJOSEConsumer;
   LJWT: TJOSEContext;
 {$ENDIF}
+  LPathInfo: string;
   LToken, LHeaderNormalize: string;
   LSession: TObject;
   LJSON: TJSONObject;
@@ -156,7 +157,10 @@ var
   end;
 {$ENDIF}
 begin
-  if MatchText(AHorseRequest.RawWebRequest.PathInfo, Config.SkipRoutes) then
+  LPathInfo := AHorseRequest.RawWebRequest.PathInfo;
+  if LPathInfo = EmptyStr then
+    LPathInfo := '/';
+  if MatchText(LPathInfo, Config.SkipRoutes) then
   begin
     ANext();
     Exit;
