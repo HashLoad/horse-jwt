@@ -1,19 +1,19 @@
 {
 	"hash": "6ef9161b900632671022358216c7dfe7",
-	"updated": "2021-01-29T08:10:14.3922009-03:00",
+	"updated": "2022-02-16T09:12:51.9203789-03:00",
 	"installedModules": {
 		"github.com/hashload/horse": {
 			"name": "horse",
-			"version": "v2.0.14",
-			"hash": "38c6bebdc7b9712d6e5856d299289a26",
+			"version": "3.0.0",
+			"hash": "195e14c9c225f81a8c69d18b5118c149",
 			"artifacts": {},
 			"failed": false,
 			"changed": false
 		},
 		"github.com/hashload/jhonson": {
 			"name": "jhonson",
-			"version": "1.1.3",
-			"hash": "711f200029b2fc3aef76ab410ac5833a",
+			"version": "1.1.4",
+			"hash": "7f48e0509b98505a12fa80ee39b53aea",
 			"artifacts": {},
 			"failed": false,
 			"changed": false
