@@ -1,4 +1,4 @@
-program samples;
+program samples_auth;
 
 {$APPTYPE CONSOLE}
 

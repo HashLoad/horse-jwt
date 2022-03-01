@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{2E261CC6-ED1F-4329-9A57-9EE8D35D96EB}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="auth\samples_auth.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="client\samples_client.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="session\samples_session.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="samples_auth">
+        <MSBuild Projects="auth\samples_auth.dproj"/>
+    </Target>
+    <Target Name="samples_auth:Clean">
+        <MSBuild Projects="auth\samples_auth.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="samples_auth:Make">
+        <MSBuild Projects="auth\samples_auth.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="samples_client">
+        <MSBuild Projects="client\samples_client.dproj"/>
+    </Target>
+    <Target Name="samples_client:Clean">
+        <MSBuild Projects="client\samples_client.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="samples_client:Make">
+        <MSBuild Projects="client\samples_client.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="samples_session">
+        <MSBuild Projects="session\samples_session.dproj"/>
+    </Target>
+    <Target Name="samples_session:Clean">
+        <MSBuild Projects="session\samples_session.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="samples_session:Make">
+        <MSBuild Projects="session\samples_session.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="samples_auth;samples_client;samples_session"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="samples_auth:Clean;samples_client:Clean;samples_session:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="samples_auth:Make;samples_client:Make;samples_session:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
