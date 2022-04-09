@@ -258,7 +258,7 @@ begin
   try
     try
       {$IF DEFINED(FPC)}
-      LJSON := TJSONObject(LJWT.Claims.AsString);
+      LJSON := TJSONObject(GetJSON(LJWT.Claims.AsString));
       {$ELSE}
       LValidations.ProcessContext(LJWT);
       LJSON := LJWT.GetClaims.JSON;

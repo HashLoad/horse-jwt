@@ -6,6 +6,8 @@ static/
 **/Linux64/
 **/__history/
 **/__recovery/
+**/x86_64-win64/
+**/backup/
 src/*.~*
 *.res
 *.exe
@@ -37,3 +39,4 @@ src/*.~*
 *.a
 *.stat
 *.bak
+*.lps
