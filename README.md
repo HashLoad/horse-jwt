@@ -250,7 +250,7 @@ uses
 
 begin
   THorse
-    .AddCallback(HorseJWT('MY-PASSWORD', TMyClaims)) // Add custom payload class
+    .AddCallback(HorseJWT('MY-PASSWORD', THorseJWTConfig.New.SessionClass(TMyClaims))) // Add custom payload class
     .Get('ping', 
       procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
       var
@@ -322,7 +322,7 @@ begin
 
   // Route private
   THorse
-    .AddCallback(HorseJWT('MY-PASSWORD', TMyClaims)) // Add custom payload class
+    .AddCallback(HorseJWT('MY-PASSWORD', THorseJWTConfig.New.SessionClass(TMyClaims))) // Add custom payload class  
     .Get('private', 
       procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
       var
