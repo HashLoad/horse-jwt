@@ -94,6 +94,30 @@ begin
 end.
 ```
 
+#### Skip routes
+
+```delphi
+uses Horse, Horse.JWT;
+
+begin
+  THorse.Use(HorseJWT('MY-PASSWORD', THorseJWTConfig.New.SkipRoutes(['public'])));
+
+  THorse.Get('public',
+    procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+    begin
+      Res.Send('public route');
+    end);
+
+  THorse.Get('private',
+    procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+    begin
+      Res.Send('private route');
+    end);
+
+  THorse.Listen(9000);
+end.
+```
+
 ## Usage samples
 
 #### How to create the token?
