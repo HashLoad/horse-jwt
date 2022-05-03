@@ -21,6 +21,7 @@ type
   ['{71A29190-1528-4E4D-932D-86094DDA9B4A}']
      function SkipRoutes: TArray<string>; overload;
      function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
+     function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
      function Header: string; overload;
      function Header(const AValue: string): IHorseJWTConfig; overload;
      function IsRequiredSubject: Boolean; overload;
@@ -54,6 +55,7 @@ type
     FSessionClass: TClass;
     function SkipRoutes: TArray<string>; overload;
     function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
+    function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
     function Header: string; overload;
     function Header(const AValue: string): IHorseJWTConfig; overload;
     function IsRequiredSubject: Boolean; overload;
@@ -407,6 +409,11 @@ function THorseJWTConfig.SessionClass(const AValue: TClass): IHorseJWTConfig;
 begin
   FSessionClass := AValue;
   Result := Self;
+end;
+
+function THorseJWTConfig.SkipRoutes(const ARoute: string): IHorseJWTConfig;
+begin
+  Result := SkipRoutes([ARoute]);
 end;
 
 constructor THorseJWTConfig.Create;

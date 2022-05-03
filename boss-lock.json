@@ -1,6 +1,6 @@
 {
-	"hash": "445774d05b3e1b873cfcdb89032b3e1f",
-	"updated": "2022-02-16T09:12:07.6951428-03:00",
+	"hash": "d41d8cd98f00b204e9800998ecf8427e",
+	"updated": "2022-02-08T14:16:13.4097104-03:00",
 	"installedModules": {
 		"github.com/andre-djsystem/hashlib4pascal": {
 			"name": "hashlib4pascal",
@@ -12,8 +12,8 @@
 		},
 		"github.com/hashload/horse": {
 			"name": "horse",
-			"version": "3.0.0",
-			"hash": "195e14c9c225f81a8c69d18b5118c149",
+			"version": "3.0.1",
+			"hash": "4533d4457de32678b73d0f990ded34c8",
 			"artifacts": {},
 			"failed": false,
 			"changed": false
