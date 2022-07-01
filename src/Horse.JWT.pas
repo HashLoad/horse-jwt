@@ -82,14 +82,6 @@ procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseRespons
 
 implementation
 
-uses
-{$IF DEFINED(FPC)}
-  StrUtils
-{$ELSE}
-  System.StrUtils
-{$ENDIF}
-  ;
-
 var
   Config: IHorseJWTConfig;
   SecretJWT: string;
@@ -162,7 +154,7 @@ begin
   LPathInfo := AHorseRequest.RawWebRequest.PathInfo;
   if LPathInfo = EmptyStr then
     LPathInfo := '/';
-  if MatchText(LPathInfo, Config.SkipRoutes) then
+  if MatchRoute(LPathInfo, Config.SkipRoutes) then
   begin
     ANext();
     Exit;
