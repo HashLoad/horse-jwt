@@ -9,7 +9,7 @@ interface
 uses
 {$IF DEFINED(FPC)}
   Generics.Collections, Classes, fpjson, SysUtils, HTTPDefs, fpjwt, Base64, DateUtils, jsonparser,
-  HlpIHashInfo, HlpConverters, HlpHashFactory,
+  HlpIHashInfo, HlpConverters, HlpHashFactory, StrUtils,
 {$ELSE}
   System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, Web.HTTPApp, REST.JSON, JOSE.Core.JWT,
   JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context,
