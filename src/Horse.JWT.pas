@@ -87,7 +87,7 @@ begin
   if not Assigned(AConfig) then
     AConfig := THorseJWTConfig.New;
 
-  Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware(AConfig, ASecretJWT){$ENDIF};
+  Result := {$IF DEFINED(FPC)}@Middleware(AConfig, ASecretJWT){$ELSE}Middleware(AConfig, ASecretJWT){$ENDIF};
 end;
 
 function Middleware(const AConfig: IHorseJWTConfig; const ASecretJWT: string): THorseCallback;
