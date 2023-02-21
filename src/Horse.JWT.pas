@@ -11,33 +11,33 @@ uses
   Generics.Collections, Classes, fpjson, SysUtils, HTTPDefs, fpjwt, Base64, DateUtils, jsonparser,
   HlpIHashInfo, HlpConverters, HlpHashFactory, StrUtils,
 {$ELSE}
-  System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, Web.HTTPApp, REST.JSON, JOSE.Core.JWT,
+    System.Generics.Collections, System.Classes, System.JSON, System.SysUtils, Web.HTTPApp, REST.JSON, JOSE.Core.JWT,
   JOSE.Core.JWK, JOSE.Core.Builder, JOSE.Consumer.Validators, JOSE.Consumer, JOSE.Context,
 {$ENDIF}
   Horse, Horse.Commons;
 
 type
   IHorseJWTConfig = interface
-  ['{71A29190-1528-4E4D-932D-86094DDA9B4A}']
-     function SkipRoutes: TArray<string>; overload;
-     function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
-     function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
-     function Header: string; overload;
-     function Header(const AValue: string): IHorseJWTConfig; overload;
-     function IsRequiredSubject: Boolean; overload;
-     function IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig; overload;
-     function IsRequiredIssuedAt: Boolean; overload;
-     function IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig; overload;
-     function IsRequiredNotBefore: Boolean; overload;
-     function IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig; overload;
-     function IsRequiredExpirationTime: Boolean; overload;
-     function IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig; overload;
-     function IsRequireAudience: Boolean; overload;
-     function IsRequireAudience(const AValue: Boolean): IHorseJWTConfig; overload;
-     function ExpectedAudience: TArray<string>; overload;
-     function ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig; overload;
-     function SessionClass: TClass; overload;
-     function SessionClass(const AValue: TClass): IHorseJWTConfig; overload;
+    ['{71A29190-1528-4E4D-932D-86094DDA9B4A}']
+    function SkipRoutes: TArray<string>; overload;
+    function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
+    function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
+    function Header: string; overload;
+    function Header(const AValue: string): IHorseJWTConfig; overload;
+    function IsRequiredSubject: Boolean; overload;
+    function IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredIssuedAt: Boolean; overload;
+    function IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredNotBefore: Boolean; overload;
+    function IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredExpirationTime: Boolean; overload;
+    function IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequireAudience: Boolean; overload;
+    function IsRequireAudience(const AValue: Boolean): IHorseJWTConfig; overload;
+    function ExpectedAudience: TArray<string>; overload;
+    function ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig; overload;
+    function SessionClass: TClass; overload;
+    function SessionClass(const AValue: TClass): IHorseJWTConfig; overload;
   end;
 
   { THorseJWTConfig }
@@ -78,223 +78,220 @@ type
   end;
 
 function HorseJWT(ASecretJWT: string; AConfig: IHorseJWTConfig = nil): THorseCallback;
-procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
+function Middleware(const AConfig: IHorseJWTConfig; const ASecretJWT: string): THorseCallback;
 
 implementation
 
-var
-  Config: IHorseJWTConfig;
-  SecretJWT: string;
-
 function HorseJWT(ASecretJWT: string; AConfig: IHorseJWTConfig): THorseCallback;
 begin
-  SecretJWT := ASecretJWT;
-  Config := AConfig;
   if not Assigned(AConfig) then
-    Config := THorseJWTConfig.New;
-  Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
+    AConfig := THorseJWTConfig.New;
+
+  Result := {$IF DEFINED(FPC)}@Middleware(AConfig, ASecretJWT){$ELSE}Middleware(AConfig, ASecretJWT){$ENDIF};
 end;
 
-procedure Middleware(AHorseRequest: THorseRequest;
-  AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
-var
-{$IF DEFINED(FPC)}
-  LJWT: TJWT;
-{$ELSE}
-  LBuilder: IJOSEConsumerBuilder;
-  LValidations: IJOSEConsumer;
-  LJWT: TJOSEContext;
-{$ENDIF}
-  LPathInfo: string;
-  LToken, LHeaderNormalize: string;
-  LSession: TObject;
-  LJSON: TJSONObject;
-{$IF DEFINED(FPC)}
-  function HexToAscii(const HexStr: string): AnsiString;
-  Var
-    B: Byte;
-    Cmd: string;
-    I, L: Integer;
-  begin
-    Result := '';
-    Cmd := Trim(HexStr);
-    I := 1;
-    L := Length(Cmd);
-
-    while I < L do
-    begin
-       B := StrToInt('$' + copy(Cmd, I, 2));
-       Result := Result + AnsiChar(chr(B));
-       Inc( I, 2);
-    end;
-  end;
-
-  function ValidateSignature: Boolean;
-  var
-    LHMAC: IHMAC;
-    LSignCalc: String;
-  begin
-    if (LJWT.JOSE.alg = 'HS256') then
-      LHMAC := THashFactory.THMAC.CreateHMAC(THashFactory.TCrypto.CreateSHA2_256)
-    else if (LJWT.JOSE.alg = 'HS384') then
-      LHMAC := THashFactory.THMAC.CreateHMAC(THashFactory.TCrypto.CreateSHA2_384)
-    else if (LJWT.JOSE.alg = 'HS512') then
-      LHMAC := THashFactory.THMAC.CreateHMAC(THashFactory.TCrypto.CreateSHA2_512)
-    else
-      raise Exception.Create('[alg] not implemented');
-
-    LHMAC.Key := TConverters.ConvertStringToBytes(UTF8Encode(SecretJWT), TEncoding.UTF8);
-    LSignCalc := HexToAscii(TConverters.ConvertBytesToHexString(LHMAC.ComputeString(UTF8Encode(Trim(Copy(LToken,1,NPos('.',LToken,2)-1))), TEncoding.UTF8).GetBytes,False));
-    LSignCalc := LJWT.Base64ToBase64URL(EncodeStringBase64(LSignCalc));
-
-    Result := (LJWT.Signature = LSignCalc);
-  end;
-{$ENDIF}
+function Middleware(const AConfig: IHorseJWTConfig; const ASecretJWT: string): THorseCallback;
 begin
-  LPathInfo := AHorseRequest.RawWebRequest.PathInfo;
-  if LPathInfo = EmptyStr then
-    LPathInfo := '/';
-  if MatchRoute(LPathInfo, Config.SkipRoutes) then
-  begin
-    ANext();
-    Exit;
-  end;
+  Result := procedure(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF})
+    var
+      {$IF DEFINED(FPC)}
+      LJWT: TJWT;
+      {$ELSE}
+      LBuilder: IJOSEConsumerBuilder;
+      LValidations: IJOSEConsumer;
+      LJWT: TJOSEContext;
+      {$ENDIF}
+      LPathInfo: string;
+      LToken, LHeaderNormalize: string;
+      LSession: TObject;
+      LJSON: TJSONObject;
+      {$IF DEFINED(FPC)}
+      function HexToAscii(const HexStr: string): AnsiString;
+      Var
+        B: Byte;
+        Cmd: string;
+        I, L: Integer;
+      begin
+        Result := '';
+        Cmd := Trim(HexStr);
+        I := 1;
+        L := Length(Cmd);
 
-  LHeaderNormalize := Config.Header;
+        while I < L do
+        begin
+          B := StrToInt('$' + copy(Cmd, I, 2));
+          Result := Result + AnsiChar(chr(B));
+          Inc(I, 2);
+        end;
+      end;
 
-  if Length(LHeaderNormalize) > 0 then
-    LHeaderNormalize[1] := UpCase(LHeaderNormalize[1]);
+      function ValidateSignature: Boolean;
+      var
+        LHMAC: IHMAC;
+        LSignCalc: String;
+      begin
+        if (LJWT.JOSE.alg = 'HS256') then
+          LHMAC := THashFactory.THMAC.CreateHMAC(THashFactory.TCrypto.CreateSHA2_256)
+        else
+          if (LJWT.JOSE.alg = 'HS384') then
+            LHMAC := THashFactory.THMAC.CreateHMAC(THashFactory.TCrypto.CreateSHA2_384)
+          else
+            if (LJWT.JOSE.alg = 'HS512') then
+              LHMAC := THashFactory.THMAC.CreateHMAC(THashFactory.TCrypto.CreateSHA2_512)
+            else
+              raise Exception.Create('[alg] not implemented');
 
-  LToken := AHorseRequest.Headers[Config.Header];
-  if LToken.Trim.IsEmpty and not AHorseRequest.Query.TryGetValue(Config.Header, LToken) and not AHorseRequest.Query.TryGetValue(LHeaderNormalize, LToken) then
-  begin
-    AHorseResponse.Send('Token not found').Status(THTTPStatus.Unauthorized);
-    raise EHorseCallbackInterrupted.Create;
-  end;
+        LHMAC.Key := TConverters.ConvertStringToBytes(UTF8Encode(ASecretJWT), TEncoding.UTF8);
+        LSignCalc := HexToAscii(TConverters.ConvertBytesToHexString(LHMAC.ComputeString(UTF8Encode(Trim(copy(LToken, 1, NPos('.', LToken, 2) - 1))), TEncoding.UTF8).GetBytes, False));
+        LSignCalc := LJWT.Base64ToBase64URL(EncodeStringBase64(LSignCalc));
 
-  if Pos('bearer', LowerCase(LToken)) = 0 then
-  begin
-    AHorseResponse.Send('Invalid authorization type').Status(THTTPStatus.Unauthorized);
-    raise EHorseCallbackInterrupted.Create;
-  end;
+        Result := (LJWT.Signature = LSignCalc);
+      end;
+    {$ENDIF}
 
-  LToken := Trim(LToken.Replace('bearer', '', [rfIgnoreCase]));
+    begin
+      LPathInfo := AHorseRequest.RawWebRequest.PathInfo;
+      if LPathInfo = EmptyStr then
+        LPathInfo := '/';
+      if MatchRoute(LPathInfo, AConfig.SkipRoutes) then
+      begin
+        ANext();
+        Exit;
+      end;
 
-  {$IFNDEF FPC}
-  LBuilder  :=  TJOSEConsumerBuilder
-    .NewConsumer
-    .SetVerificationKey(SecretJWT)
-    .SetSkipVerificationKeyValidation;
+      LHeaderNormalize := AConfig.Header;
 
-  if Assigned(Config) then
-  begin
-    LBuilder.SetExpectedAudience(Config.IsRequireAudience, Config.ExpectedAudience);
-    if Config.IsRequiredExpirationTime then
-      LBuilder.SetRequireExpirationTime;
-    if Config.IsRequiredIssuedAt then
-      LBuilder.SetRequireIssuedAt;
-    if Config.IsRequiredNotBefore then
-      LBuilder.SetRequireNotBefore;
-    if Config.IsRequiredSubject then
-      LBuilder.SetRequireSubject;
-  end;
+      if Length(LHeaderNormalize) > 0 then
+        LHeaderNormalize[1] := UpCase(LHeaderNormalize[1]);
 
-  LValidations := LBuilder.Build;
-  {$ENDIF}
+      LToken := AHorseRequest.Headers[AConfig.Header];
+      if LToken.Trim.IsEmpty and not AHorseRequest.Query.TryGetValue(AConfig.Header, LToken) and not AHorseRequest.Query.TryGetValue(LHeaderNormalize, LToken) then
+      begin
+        AHorseResponse.Send('Token not found').Status(THTTPStatus.Unauthorized);
+        raise EHorseCallbackInterrupted.Create;
+      end;
 
-  try
-    {$IF DEFINED(FPC)}
-    LJWT := TJWT.Create;
-    LJWT.AsString := LToken;
-    if (Trim(LJWT.Signature) = EmptyStr) or (not ValidateSignature) then
-      raise Exception.Create('Invalid signature');
+      if Pos('bearer', LowerCase(LToken)) = 0 then
+      begin
+        AHorseResponse.Send('Invalid authorization type').Status(THTTPStatus.Unauthorized);
+        raise EHorseCallbackInterrupted.Create;
+      end;
 
-    if (LJWT.Claims.exp <> 0) and (LJWT.Claims.exp < DateTimeToUnix(Now)) then
-      raise  Exception.Create(Format(
+      LToken := Trim(LToken.Replace('bearer', '', [rfIgnoreCase]));
+
+      {$IFNDEF FPC}
+      LBuilder := TJOSEConsumerBuilder
+        .NewConsumer
+        .SetVerificationKey(ASecretJWT)
+        .SetSkipVerificationKeyValidation;
+
+      if Assigned(AConfig) then
+      begin
+        LBuilder.SetExpectedAudience(AConfig.IsRequireAudience, AConfig.ExpectedAudience);
+        if AConfig.IsRequiredExpirationTime then
+          LBuilder.SetRequireExpirationTime;
+        if AConfig.IsRequiredIssuedAt then
+          LBuilder.SetRequireIssuedAt;
+        if AConfig.IsRequiredNotBefore then
+          LBuilder.SetRequireNotBefore;
+        if AConfig.IsRequiredSubject then
+          LBuilder.SetRequireSubject;
+      end;
+
+      LValidations := LBuilder.Build;
+      {$ENDIF}
+      try
+        {$IF DEFINED(FPC)}
+        LJWT := TJWT.Create;
+        LJWT.AsString := LToken;
+        if (Trim(LJWT.Signature) = EmptyStr) or (not ValidateSignature) then
+          raise Exception.Create('Invalid signature');
+
+        if (LJWT.Claims.exp <> 0) and (LJWT.Claims.exp < DateTimeToUnix(Now)) then
+          raise Exception.Create(Format(
             'The JWT is no longer valid - the evaluation time [%s] is on or after the Expiration Time [exp=%s]',
             [DateToISO8601(Now, False), DateToISO8601(LJWT.Claims.exp, False)]));
 
-    if (LJWT.Claims.nbf <> 0) and (LJWT.Claims.nbf < DateTimeToUnix(Now)) then
-      raise  Exception.Create(Format('The JWT is not yet valid as the evaluation time [%s] is before the NotBefore [nbf=%s]',
+        if (LJWT.Claims.nbf <> 0) and (LJWT.Claims.nbf < DateTimeToUnix(Now)) then
+          raise Exception.Create(Format('The JWT is not yet valid as the evaluation time [%s] is before the NotBefore [nbf=%s]',
             [DateToISO8601(Now, False), DateToISO8601(LJWT.Claims.nbf)]));
 
-    if Assigned(Config) then
-    begin
-      if Config.IsRequireAudience and ((LJWT.Claims.aud) = EmptyStr) then
-        raise  Exception.Create('No Audience [aud] claim present');
+        if Assigned(AConfig) then
+        begin
+          if AConfig.IsRequireAudience and ((LJWT.Claims.aud) = EmptyStr) then
+            raise Exception.Create('No Audience [aud] claim present');
 
-      if (Length(Config.ExpectedAudience)>0) and (not MatchText(LJWT.Claims.aud, Config.ExpectedAudience)) then
-        raise  Exception.Create('Audience [aud] claim present in the JWT but no expected audience value(s) were provided');
+          if (Length(AConfig.ExpectedAudience) > 0) and (not MatchText(LJWT.Claims.aud, AConfig.ExpectedAudience)) then
+            raise Exception.Create('Audience [aud] claim present in the JWT but no expected audience value(s) were provided');
 
-      if Config.IsRequiredExpirationTime and ((LJWT.Claims.exp) = 0) then
-        raise  Exception.Create('No Expiration Time [exp] claim present');
+          if AConfig.IsRequiredExpirationTime and ((LJWT.Claims.exp) = 0) then
+            raise Exception.Create('No Expiration Time [exp] claim present');
 
-      if Config.IsRequiredIssuedAt and ((LJWT.Claims.iat) = 0) then
-        raise  Exception.Create('No IssuedAt [iat] claim present');
+          if AConfig.IsRequiredIssuedAt and ((LJWT.Claims.iat) = 0) then
+            raise Exception.Create('No IssuedAt [iat] claim present');
 
-      if Config.IsRequiredNotBefore and ((LJWT.Claims.nbf) = 0) then
-        raise  Exception.Create('No NotBefore [nbf] claim present');
+          if AConfig.IsRequiredNotBefore and ((LJWT.Claims.nbf) = 0) then
+            raise Exception.Create('No NotBefore [nbf] claim present');
 
-      if Config.IsRequiredSubject and ((LJWT.Claims.sub) = EmptyStr) then
-        raise  Exception.Create('No Subject [sub] claim present');
-    end;
-    {$ELSE}
-    LJWT := TJOSEContext.Create(LToken, TJWTClaims);
-    {$ENDIF}
-  except
-    on E: exception do
-    begin
-      AHorseResponse.Send('Invalid token authorization. '+E.Message).Status(THTTPStatus.Unauthorized);
-      raise EHorseCallbackInterrupted.Create;
-    end;
-  end;
-
-  try
-    try
-      {$IF DEFINED(FPC)}
-      LJSON := TJSONObject(LJWT.Claims.AsString);
-      {$ELSE}
-      LValidations.ProcessContext(LJWT);
-      LJSON := LJWT.GetClaims.JSON;
-      {$ENDIF}
-
-      if Assigned(Config.SessionClass) then
-      begin
-        LSession := Config.SessionClass.Create;
-        {$IF DEFINED(FPC)}
-        TClaims(LSession).LoadFromJSON(LJSON);
+          if AConfig.IsRequiredSubject and ((LJWT.Claims.sub) = EmptyStr) then
+            raise Exception.Create('No Subject [sub] claim present');
+        end;
         {$ELSE}
-        TJWTClaims(LSession).JSON := LJSON.Clone as TJSONObject;
+        LJWT := TJOSEContext.Create(LToken, TJWTClaims);
         {$ENDIF}
-      end
-      else
-      {$IF DEFINED(FPC)}
-        LSession := LJSON;
-      {$ELSE}
-        LSession := LJSON.Clone;
-      {$ENDIF}
+      except
+        on E: Exception do
+        begin
+          AHorseResponse.Send('Invalid token authorization. ' + E.Message).Status(THTTPStatus.Unauthorized);
+          raise EHorseCallbackInterrupted.Create;
+        end;
+      end;
 
-      AHorseRequest.Session(LSession);
-    except
-      on E: exception do
-      begin
-        if E.InheritsFrom(EHorseCallbackInterrupted) then
-          raise EHorseCallbackInterrupted(E);
-        AHorseResponse.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
-        raise EHorseCallbackInterrupted.Create;
+      try
+        try
+          {$IF DEFINED(FPC)}
+          LJSON := TJSONObject(LJWT.Claims.AsString);
+          {$ELSE}
+          LValidations.ProcessContext(LJWT);
+          LJSON := LJWT.GetClaims.JSON;
+          {$ENDIF}
+          if Assigned(AConfig.SessionClass) then
+          begin
+            LSession := AConfig.SessionClass.Create;
+            {$IF DEFINED(FPC)}
+            TClaims(LSession).LoadFromJSON(LJSON);
+            {$ELSE}
+            TJWTClaims(LSession).JSON := LJSON.Clone as TJSONObject;
+            {$ENDIF}
+          end
+          else
+            {$IF DEFINED(FPC)}
+            LSession := LJSON;
+            {$ELSE}
+            LSession := LJSON.Clone;
+            {$ENDIF}
+          AHorseRequest.Session(LSession);
+        except
+          on E: Exception do
+          begin
+            if E.InheritsFrom(EHorseCallbackInterrupted) then
+              raise EHorseCallbackInterrupted(E);
+            AHorseResponse.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
+            raise EHorseCallbackInterrupted.Create;
+          end;
+        end;
+        try
+          ANext();
+        finally
+          {$IFNDEF FPC}
+          if Assigned(LSession) then
+            LSession.Free;
+          {$ENDIF}
+        end;
+      finally
+        LJWT.Free;
       end;
     end;
-    try
-      ANext();
-    finally
-      {$IFNDEF FPC}
-      if Assigned(LSession) then
-        LSession.Free;
-      {$ENDIF}
-    end;
-  finally
-    LJWT.Free;
-  end;
 end;
 
 { THorseJWTConfig }
