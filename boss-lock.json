@@ -20,8 +20,8 @@
 		},
 		"github.com/paolo-rossi/delphi-jose-jwt": {
 			"name": "delphi-jose-jwt",
-			"version": "v3.0.3",
-			"hash": "d8b6ff80aff10e83d87219f45fa43ffb",
+			"version": "v3.2.0",
+			"hash": "eadfcb98abd01d919ed5be0d0b5cd5e7",
 			"artifacts": {},
 			"failed": false,
 			"changed": false
