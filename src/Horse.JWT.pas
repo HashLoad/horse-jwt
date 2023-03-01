@@ -100,8 +100,7 @@ type
   end;
 
 function HorseJWT(ASecretJWT: string; AConfig: IHorseJWTConfig = nil): THorseCallback;
-procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse;
-  ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
+procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
 
 implementation
 
@@ -115,17 +114,10 @@ begin
   Config := AConfig;
   if not Assigned(AConfig) then
     Config := THorseJWTConfig.New;
-  Result :=
-{$IF DEFINED(FPC)}
-    @Middleware
-{$ELSE}
-    Middleware
-{$ENDIF}
-    ;
+  Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
 end;
 
-procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse;
-  ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
+procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
 var
 {$IF DEFINED(FPC)}
   LJWT: TJWT;
@@ -181,8 +173,6 @@ var
     Result := (LJWT.Signature = LSignCalc);
   end;
 {$ENDIF}
-
-
 begin
   LPathInfo := AHorseRequest.RawWebRequest.PathInfo;
   if LPathInfo = EmptyStr then
