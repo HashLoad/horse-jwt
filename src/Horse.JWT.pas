@@ -182,6 +182,7 @@ var
   end;
 {$ENDIF}
 
+
 begin
   LPathInfo := AHorseRequest.RawWebRequest.PathInfo;
   if LPathInfo = EmptyStr then
@@ -244,23 +245,6 @@ begin
         end
         else
           LSession := LJSON.Clone;
-
-        AHorseRequest.Session(LSession);
-        ANext();
-
-      except
-        on E: EHorseCallbackInterrupted do
-          raise;
-        on E: Exception do
-        begin
-          AHorseResponse.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
-          raise EHorseCallbackInterrupted.Create;
-        end;
-      end;
-    finally
-      LJWT.Free;
-    end;
-
 {$ELSE}
     LJWT := TJWT.Create;
     try
@@ -307,10 +291,9 @@ begin
         end
         else
           LSession := LJSON;
-
+{$ENDIF}
         AHorseRequest.Session(LSession);
         ANext();
-
       except
         on E: EHorseCallbackInterrupted do
           raise;
@@ -323,7 +306,6 @@ begin
     finally
       LJWT.Free;
     end;
-{$ENDIF}
   except
     on E: EHorseCallbackInterrupted do
       raise;
