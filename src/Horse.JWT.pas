@@ -46,16 +46,16 @@ type
     function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
     function Header: string; overload;
     function Header(const AValue: string): IHorseJWTConfig; overload;
-    function IsRequiredSubject: Boolean; overload;
-    function IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig; overload;
-    function IsRequiredIssuedAt: Boolean; overload;
-    function IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig; overload;
-    function IsRequiredNotBefore: Boolean; overload;
-    function IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig; overload;
-    function IsRequiredExpirationTime: Boolean; overload;
-    function IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig; overload;
-    function IsRequireAudience: Boolean; overload;
-    function IsRequireAudience(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredSubject: boolean; overload;
+    function IsRequiredSubject(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequiredIssuedAt: boolean; overload;
+    function IsRequiredIssuedAt(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequiredNotBefore: boolean; overload;
+    function IsRequiredNotBefore(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequiredExpirationTime: boolean; overload;
+    function IsRequiredExpirationTime(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequireAudience: boolean; overload;
+    function IsRequireAudience(const AValue: boolean): IHorseJWTConfig; overload;
     function ExpectedAudience: TArray<string>; overload;
     function ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig; overload;
     function SessionClass: TClass; overload;
@@ -68,28 +68,28 @@ type
   private
     FHeader: string;
     FSkipRoutes: TArray<string>;
-    FIsRequireAudience: Boolean;
+    FIsRequireAudience: boolean;
     FExpectedAudience: TArray<string>;
-    FIsRequiredExpirationTime: Boolean;
-    FIsRequiredIssuedAt: Boolean;
-    FIsRequiredNotBefore: Boolean;
-    FIsRequiredSubject: Boolean;
+    FIsRequiredExpirationTime: boolean;
+    FIsRequiredIssuedAt: boolean;
+    FIsRequiredNotBefore: boolean;
+    FIsRequiredSubject: boolean;
     FSessionClass: TClass;
     function SkipRoutes: TArray<string>; overload;
     function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
     function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
     function Header: string; overload;
     function Header(const AValue: string): IHorseJWTConfig; overload;
-    function IsRequiredSubject: Boolean; overload;
-    function IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig; overload;
-    function IsRequiredIssuedAt: Boolean; overload;
-    function IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig; overload;
-    function IsRequiredNotBefore: Boolean; overload;
-    function IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig; overload;
-    function IsRequiredExpirationTime: Boolean; overload;
-    function IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig; overload;
-    function IsRequireAudience: Boolean; overload;
-    function IsRequireAudience(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredSubject: boolean; overload;
+    function IsRequiredSubject(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequiredIssuedAt: boolean; overload;
+    function IsRequiredIssuedAt(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequiredNotBefore: boolean; overload;
+    function IsRequiredNotBefore(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequiredExpirationTime: boolean; overload;
+    function IsRequiredExpirationTime(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequireAudience: boolean; overload;
+    function IsRequireAudience(const AValue: boolean): IHorseJWTConfig; overload;
     function ExpectedAudience: TArray<string>; overload;
     function ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig; overload;
     function SessionClass: TClass; overload;
@@ -99,25 +99,12 @@ type
     class function New: IHorseJWTConfig;
   end;
 
-function HorseJWT(ASecretJWT: string; AConfig: IHorseJWTConfig = nil): THorseCallback;
-procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
+function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig = nil): THorseCallback;
 
 implementation
 
-var
-  Config: IHorseJWTConfig;
-  SecretJWT: string;
 
-function HorseJWT(ASecretJWT: string; AConfig: IHorseJWTConfig): THorseCallback;
-begin
-  SecretJWT := ASecretJWT;
-  Config := AConfig;
-  if not Assigned(AConfig) then
-    Config := THorseJWTConfig.New;
-  Result := {$IF DEFINED(FPC)}@Middleware{$ELSE}Middleware{$ENDIF};
-end;
-
-procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
+procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF}; const ASecretJWT: string; const AConfig: IHorseJWTConfig);
 var
 {$IF DEFINED(FPC)}
   LJWT: TJWT;
@@ -130,9 +117,11 @@ var
   LToken, LHeaderNormalize: string;
   LSession: TObject;
   LJSON: TJSONObject;
+  LConfig: IHorseJWTConfig;
+
 {$IF DEFINED(FPC)}
   function HexToAscii(const HexStr: string): AnsiString;
-  Var
+  var
     B: Byte;
     Cmd: string;
     I, L: Integer;
@@ -150,10 +139,10 @@ var
     end;
   end;
 
-  function ValidateSignature: Boolean;
+  function ValidateSignature: boolean;
   var
     LHMAC: IHMAC;
-    LSignCalc: String;
+    LSignCalc: string;
   begin
     if (LJWT.JOSE.alg = 'HS256') then
       LHMAC := THashFactory.THMAC.CreateHMAC(THashFactory.TCrypto.CreateSHA2_256)
@@ -166,7 +155,7 @@ var
     else
       raise Exception.Create('[alg] not implemented');
 
-    LHMAC.Key := TConverters.ConvertStringToBytes(UTF8Encode(SecretJWT), TEncoding.UTF8);
+    LHMAC.Key := TConverters.ConvertStringToBytes(UTF8Encode(ASecretJWT), TEncoding.UTF8);
     LSignCalc := HexToAscii(TConverters.ConvertBytesToHexString(LHMAC.ComputeString(UTF8Encode(Trim(copy(LToken, 1, NPos('.', LToken, 2) - 1))), TEncoding.UTF8).GetBytes, False));
     LSignCalc := LJWT.Base64ToBase64URL(EncodeStringBase64(LSignCalc));
 
@@ -174,23 +163,26 @@ var
   end;
 {$ENDIF}
 begin
+  LConfig := AConfig;
+  if AConfig = nil then
+    LConfig := THorseJWTConfig.New;
   LPathInfo := AHorseRequest.RawWebRequest.PathInfo;
   if LPathInfo = EmptyStr then
     LPathInfo := '/';
-  if MatchRoute(LPathInfo, Config.SkipRoutes) then
+  if MatchRoute(LPathInfo, LConfig.SkipRoutes) then
   begin
     ANext();
     Exit;
   end;
 
-  LHeaderNormalize := Config.Header;
+  LHeaderNormalize := LConfig.Header;
 
   if Length(LHeaderNormalize) > 0 then
     LHeaderNormalize[1] := UpCase(LHeaderNormalize[1]);
 
-  LToken := AHorseRequest.Headers[Config.Header];
+  LToken := AHorseRequest.Headers[LConfig.Header];
   if LToken.Trim.IsEmpty and not AHorseRequest.Query.TryGetValue(
-    Config.Header, LToken) and not AHorseRequest.Query.TryGetValue(
+    LConfig.Header, LToken) and not AHorseRequest.Query.TryGetValue(
     LHeaderNormalize, LToken) then
   begin
     AHorseResponse.Send('Token not found').Status(THTTPStatus.Unauthorized);
@@ -206,19 +198,19 @@ begin
   LToken := Trim(LToken.Replace('bearer', '', [rfIgnoreCase]));
   try
 {$IFNDEF FPC}
-    LBuilder := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey(SecretJWT)
+    LBuilder := TJOSEConsumerBuilder.NewConsumer.SetVerificationKey(ASecretJWT)
       .SetSkipVerificationKeyValidation;
 
-    if Assigned(Config) then
+    if Assigned(LConfig) then
     begin
-      LBuilder.SetExpectedAudience(Config.IsRequireAudience, Config.ExpectedAudience);
-      if Config.IsRequiredExpirationTime then
+      LBuilder.SetExpectedAudience(LConfig.IsRequireAudience, LConfig.ExpectedAudience);
+      if LConfig.IsRequiredExpirationTime then
         LBuilder.SetRequireExpirationTime;
-      if Config.IsRequiredIssuedAt then
+      if LConfig.IsRequiredIssuedAt then
         LBuilder.SetRequireIssuedAt;
-      if Config.IsRequiredNotBefore then
+      if LConfig.IsRequiredNotBefore then
         LBuilder.SetRequireNotBefore;
-      if Config.IsRequiredSubject then
+      if LConfig.IsRequiredSubject then
         LBuilder.SetRequireSubject;
     end;
 
@@ -228,9 +220,9 @@ begin
       try
         LValidations.ProcessContext(LJWT);
         LJSON := LJWT.GetClaims.JSON;
-        if Assigned(Config.SessionClass) then
+        if Assigned(LConfig.SessionClass) then
         begin
-          LSession := Config.SessionClass.Create;
+          LSession := LConfig.SessionClass.Create;
           TJWTClaims(LSession).JSON := LJSON.Clone as TJSONObject;
         end
         else
@@ -252,31 +244,31 @@ begin
           raise Exception.Create(Format('The JWT is not yet valid as the evaluation time [%s] is before the NotBefore [nbf=%s]',
             [DateToISO8601(Now, False), DateToISO8601(LJWT.Claims.nbf)]));
 
-        if Assigned(Config) then
+        if Assigned(LConfig) then
         begin
-          if Config.IsRequireAudience and ((LJWT.Claims.aud) = EmptyStr) then
+          if LConfig.IsRequireAudience and ((LJWT.Claims.aud) = EmptyStr) then
             raise Exception.Create('No Audience [aud] claim present');
 
-          if (Length(Config.ExpectedAudience) > 0) and (not MatchText(LJWT.Claims.aud, Config.ExpectedAudience)) then
+          if (Length(LConfig.ExpectedAudience) > 0) and (not MatchText(LJWT.Claims.aud, LConfig.ExpectedAudience)) then
             raise Exception.Create('Audience [aud] claim present in the JWT but no expected audience value(s) were provided');
 
-          if Config.IsRequiredExpirationTime and ((LJWT.Claims.exp) = 0) then
+          if LConfig.IsRequiredExpirationTime and ((LJWT.Claims.exp) = 0) then
             raise Exception.Create('No Expiration Time [exp] claim present');
 
-          if Config.IsRequiredIssuedAt and ((LJWT.Claims.iat) = 0) then
+          if LConfig.IsRequiredIssuedAt and ((LJWT.Claims.iat) = 0) then
             raise Exception.Create('No IssuedAt [iat] claim present');
 
-          if Config.IsRequiredNotBefore and ((LJWT.Claims.nbf) = 0) then
+          if LConfig.IsRequiredNotBefore and ((LJWT.Claims.nbf) = 0) then
             raise Exception.Create('No NotBefore [nbf] claim present');
 
-          if Config.IsRequiredSubject and ((LJWT.Claims.sub) = EmptyStr) then
+          if LConfig.IsRequiredSubject and ((LJWT.Claims.sub) = EmptyStr) then
             raise Exception.Create('No Subject [sub] claim present');
         end;
 
         LJSON := TJSONObject(LJWT.Claims.AsString);
-        if Assigned(Config.SessionClass) then
+        if Assigned(LConfig.SessionClass) then
         begin
-          LSession := Config.SessionClass.Create;
+          LSession := LConfig.SessionClass.Create;
           TClaims(LSession).LoadFromJSON(LJSON);
         end
         else
@@ -301,10 +293,29 @@ begin
       raise;
     on E: Exception do
     begin
-      AHorseResponse.Send('Invalid token authorization. ' + E.Message).Status(THTTPStatus.Unauthorized);
+      AHorseResponse.Send('Invalid token authorization. ' +
+        E.Message).Status(THTTPStatus.Unauthorized);
       raise EHorseCallbackInterrupted.Create;
     end;
   end;
+end;
+
+function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig): THorseCallback;
+{$IF DEFINED(FPC)}
+  procedure Callback(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: TNextProc);
+  begin
+    Middleware(AHorseRequest, AHorseResponse, ANext, ASecretJWT, AConfig);
+  end;
+{$ENDIF}
+begin
+{$IF DEFINED(FPC)}
+  Result := Callback;
+{$ELSE}
+  Result := procedure(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: TProc)
+    begin
+      Middleware(AHorseRequest, AHorseResponse, ANext, ASecretJWT, AConfig);
+    end;
+{$ENDIF}
 end;
 
 { THorseJWTConfig }
@@ -336,57 +347,56 @@ begin
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequiredSubject: Boolean;
+function THorseJWTConfig.IsRequiredSubject: boolean;
 begin
   Result := FIsRequiredSubject;
 end;
 
-function THorseJWTConfig.IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequiredSubject(const AValue: boolean): IHorseJWTConfig;
 begin
   FIsRequiredSubject := AValue;
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequiredIssuedAt: Boolean;
+function THorseJWTConfig.IsRequiredIssuedAt: boolean;
 begin
   Result := FIsRequiredIssuedAt;
 end;
 
-function THorseJWTConfig.IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequiredIssuedAt(const AValue: boolean): IHorseJWTConfig;
 begin
   FIsRequiredIssuedAt := AValue;
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequiredNotBefore: Boolean;
+function THorseJWTConfig.IsRequiredNotBefore: boolean;
 begin
   Result := FIsRequiredNotBefore;
 end;
 
-function THorseJWTConfig.IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequiredNotBefore(const AValue: boolean): IHorseJWTConfig;
 begin
   FIsRequiredNotBefore := AValue;
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequiredExpirationTime: Boolean;
+function THorseJWTConfig.IsRequiredExpirationTime: boolean;
 begin
   Result := FIsRequiredExpirationTime;
 end;
 
-function THorseJWTConfig.IsRequiredExpirationTime(
-  const AValue: Boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequiredExpirationTime(const AValue: boolean): IHorseJWTConfig;
 begin
   FIsRequiredExpirationTime := AValue;
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequireAudience: Boolean;
+function THorseJWTConfig.IsRequireAudience: boolean;
 begin
   Result := FIsRequireAudience;
 end;
 
-function THorseJWTConfig.IsRequireAudience(const AValue: Boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequireAudience(const AValue: boolean): IHorseJWTConfig;
 begin
   FIsRequireAudience := AValue;
   Result := Self;
