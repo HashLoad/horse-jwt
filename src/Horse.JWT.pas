@@ -162,7 +162,6 @@ var
     Result := (LJWT.Signature = LSignCalc);
   end;
 {$ENDIF}
-
 begin
   LConfig := AConfig;
   if AConfig = nil then
@@ -308,7 +307,6 @@ function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig): THo
     Middleware(AHorseRequest, AHorseResponse, ANext, ASecretJWT, AConfig);
   end;
 {$ENDIF}
-
 begin
 {$IF DEFINED(FPC)}
   Result := Callback;
