@@ -46,16 +46,16 @@ type
     function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
     function Header: string; overload;
     function Header(const AValue: string): IHorseJWTConfig; overload;
-    function IsRequiredSubject: boolean; overload;
-    function IsRequiredSubject(const AValue: boolean): IHorseJWTConfig; overload;
-    function IsRequiredIssuedAt: boolean; overload;
-    function IsRequiredIssuedAt(const AValue: boolean): IHorseJWTConfig; overload;
-    function IsRequiredNotBefore: boolean; overload;
-    function IsRequiredNotBefore(const AValue: boolean): IHorseJWTConfig; overload;
-    function IsRequiredExpirationTime: boolean; overload;
-    function IsRequiredExpirationTime(const AValue: boolean): IHorseJWTConfig; overload;
-    function IsRequireAudience: boolean; overload;
-    function IsRequireAudience(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequiredSubject: Boolean; overload;
+    function IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredIssuedAt: Boolean; overload;
+    function IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredNotBefore: Boolean; overload;
+    function IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredExpirationTime: Boolean; overload;
+    function IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequireAudience: Boolean; overload;
+    function IsRequireAudience(const AValue: Boolean): IHorseJWTConfig; overload;
     function ExpectedAudience: TArray<string>; overload;
     function ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig; overload;
     function SessionClass: TClass; overload;
@@ -68,28 +68,28 @@ type
   private
     FHeader: string;
     FSkipRoutes: TArray<string>;
-    FIsRequireAudience: boolean;
+    FIsRequireAudience: Boolean;
     FExpectedAudience: TArray<string>;
-    FIsRequiredExpirationTime: boolean;
-    FIsRequiredIssuedAt: boolean;
-    FIsRequiredNotBefore: boolean;
-    FIsRequiredSubject: boolean;
+    FIsRequiredExpirationTime: Boolean;
+    FIsRequiredIssuedAt: Boolean;
+    FIsRequiredNotBefore: Boolean;
+    FIsRequiredSubject: Boolean;
     FSessionClass: TClass;
     function SkipRoutes: TArray<string>; overload;
     function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
     function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
     function Header: string; overload;
     function Header(const AValue: string): IHorseJWTConfig; overload;
-    function IsRequiredSubject: boolean; overload;
-    function IsRequiredSubject(const AValue: boolean): IHorseJWTConfig; overload;
-    function IsRequiredIssuedAt: boolean; overload;
-    function IsRequiredIssuedAt(const AValue: boolean): IHorseJWTConfig; overload;
-    function IsRequiredNotBefore: boolean; overload;
-    function IsRequiredNotBefore(const AValue: boolean): IHorseJWTConfig; overload;
-    function IsRequiredExpirationTime: boolean; overload;
-    function IsRequiredExpirationTime(const AValue: boolean): IHorseJWTConfig; overload;
-    function IsRequireAudience: boolean; overload;
-    function IsRequireAudience(const AValue: boolean): IHorseJWTConfig; overload;
+    function IsRequiredSubject: Boolean; overload;
+    function IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredIssuedAt: Boolean; overload;
+    function IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredNotBefore: Boolean; overload;
+    function IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequiredExpirationTime: Boolean; overload;
+    function IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig; overload;
+    function IsRequireAudience: Boolean; overload;
+    function IsRequireAudience(const AValue: Boolean): IHorseJWTConfig; overload;
     function ExpectedAudience: TArray<string>; overload;
     function ExpectedAudience(const AValue: TArray<string>): IHorseJWTConfig; overload;
     function SessionClass: TClass; overload;
@@ -139,7 +139,7 @@ var
     end;
   end;
 
-  function ValidateSignature: boolean;
+  function ValidateSignature: Boolean;
   var
     LHMAC: IHMAC;
     LSignCalc: string;
@@ -162,6 +162,7 @@ var
     Result := (LJWT.Signature = LSignCalc);
   end;
 {$ENDIF}
+
 begin
   LConfig := AConfig;
   if AConfig = nil then
@@ -307,6 +308,7 @@ function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig): THo
     Middleware(AHorseRequest, AHorseResponse, ANext, ASecretJWT, AConfig);
   end;
 {$ENDIF}
+
 begin
 {$IF DEFINED(FPC)}
   Result := Callback;
@@ -347,56 +349,56 @@ begin
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequiredSubject: boolean;
+function THorseJWTConfig.IsRequiredSubject: Boolean;
 begin
   Result := FIsRequiredSubject;
 end;
 
-function THorseJWTConfig.IsRequiredSubject(const AValue: boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequiredSubject(const AValue: Boolean): IHorseJWTConfig;
 begin
   FIsRequiredSubject := AValue;
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequiredIssuedAt: boolean;
+function THorseJWTConfig.IsRequiredIssuedAt: Boolean;
 begin
   Result := FIsRequiredIssuedAt;
 end;
 
-function THorseJWTConfig.IsRequiredIssuedAt(const AValue: boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequiredIssuedAt(const AValue: Boolean): IHorseJWTConfig;
 begin
   FIsRequiredIssuedAt := AValue;
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequiredNotBefore: boolean;
+function THorseJWTConfig.IsRequiredNotBefore: Boolean;
 begin
   Result := FIsRequiredNotBefore;
 end;
 
-function THorseJWTConfig.IsRequiredNotBefore(const AValue: boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequiredNotBefore(const AValue: Boolean): IHorseJWTConfig;
 begin
   FIsRequiredNotBefore := AValue;
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequiredExpirationTime: boolean;
+function THorseJWTConfig.IsRequiredExpirationTime: Boolean;
 begin
   Result := FIsRequiredExpirationTime;
 end;
 
-function THorseJWTConfig.IsRequiredExpirationTime(const AValue: boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequiredExpirationTime(const AValue: Boolean): IHorseJWTConfig;
 begin
   FIsRequiredExpirationTime := AValue;
   Result := Self;
 end;
 
-function THorseJWTConfig.IsRequireAudience: boolean;
+function THorseJWTConfig.IsRequireAudience: Boolean;
 begin
   Result := FIsRequireAudience;
 end;
 
-function THorseJWTConfig.IsRequireAudience(const AValue: boolean): IHorseJWTConfig;
+function THorseJWTConfig.IsRequireAudience(const AValue: Boolean): IHorseJWTConfig;
 begin
   FIsRequireAudience := AValue;
   Result := Self;
