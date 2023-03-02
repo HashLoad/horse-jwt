@@ -118,7 +118,6 @@ var
   LSession: TObject;
   LJSON: TJSONObject;
   LConfig: IHorseJWTConfig;
-
 {$IF DEFINED(FPC)}
   function HexToAscii(const HexStr: string): AnsiString;
   var
