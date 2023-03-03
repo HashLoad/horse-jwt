@@ -99,8 +99,6 @@ type
     class function New: IHorseJWTConfig;
   end;
 
-  PHorseCallback = ^THorseCallback;
-
 function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig = nil): THorseCallback;
 
 implementation
