@@ -99,10 +99,17 @@ type
     class function New: IHorseJWTConfig;
   end;
 
+  PHorseCallback = ^THorseCallback;
+
 function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig = nil): THorseCallback;
 
 implementation
 
+{$IF DEFINED(FPC) AND NOT DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
+var
+  SecretJWT: string;
+  Config: IHorseJWTConfig;
+{$ENDIF}
 
 procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF}; const ASecretJWT: string; const AConfig: IHorseJWTConfig);
 var
@@ -292,23 +299,35 @@ begin
       raise;
     on E: Exception do
     begin
-      AHorseResponse.Send('Invalid token authorization. ' +
-        E.Message).Status(THTTPStatus.Unauthorized);
+      AHorseResponse.Send('Invalid token authorization. ' + E.Message).Status(THTTPStatus.Unauthorized);
       raise EHorseCallbackInterrupted.Create;
     end;
   end;
 end;
 
+{$IF DEFINED(FPC) AND NOT DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
+procedure Callback(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
+begin
+  Middleware(AHorseRequest, AHorseResponse, ANext, SecretJWT, Config);
+end;
+{$ENDIF}
+
 function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig): THorseCallback;
-{$IF DEFINED(FPC)}
-  procedure Callback(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: TNextProc);
+{$IF DEFINED(FPC) AND DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
+  procedure InternalCallback(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: TNextProc);
   begin
     Middleware(AHorseRequest, AHorseResponse, ANext, ASecretJWT, AConfig);
   end;
 {$ENDIF}
 begin
 {$IF DEFINED(FPC)}
+{$IF NOT DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
+  SecretJWT := ASecretJWT;
+  Config := AConfig;
   Result := Callback;
+{$ELSE}
+  Result := InternalCallback;
+{$ENDIF}
 {$ELSE}
   Result := procedure(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: TProc)
     begin
