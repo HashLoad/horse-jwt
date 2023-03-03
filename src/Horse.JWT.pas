@@ -8,7 +8,6 @@ interface
 
 uses
 {$IF DEFINED(FPC)}
-  Generics.Collections,
   Classes,
   fpjson,
   SysUtils,
@@ -126,20 +125,20 @@ var
 {$IF DEFINED(FPC)}
   function HexToAscii(const HexStr: string): AnsiString;
   var
-    B: Byte;
-    Cmd: string;
-    I, L: Integer;
+    LByte: Byte;
+    LCmd: string;
+    LLength: Integer;
+    LIndex: Integer;
   begin
     Result := '';
-    Cmd := Trim(HexStr);
-    I := 1;
-    L := Length(Cmd);
-
-    while I < L do
+    LCmd := Trim(HexStr);
+    LIndex := 1;
+    LLength := Length(LCmd);
+    while LIndex < LLength do
     begin
-      B := StrToInt('$' + copy(Cmd, I, 2));
-      Result := Result + AnsiChar(chr(B));
-      Inc(I, 2);
+      LByte := StrToInt('$' + copy(LCmd, LIndex, 2));
+      Result := Result + AnsiChar(chr(LByte));
+      Inc(LIndex, 2);
     end;
   end;
 
