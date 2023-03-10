@@ -7,6 +7,6 @@
 	"projects": [],
 	"dependencies": {
 		"github.com/andre-djsystem/hashlib4pascal": "^1.0.0",
-		"github.com/hashload/horse": "^3.0.2"
+		"github.com/hashload/horse": "^3.1.0"
 	}
 }

@@ -6,13 +6,14 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 379
   ClientWidth = 782
-  LCLVersion = '2.2.0.4'
+  LCLVersion = '2.2.2.0'
   object Label1: TLabel
     Left = 16
     Height = 15
     Top = 8
     Width = 122
     Caption = 'SecretJWT - Private Key'
+    ParentColor = False
   end
   object edSecretJWt: TEdit
     Left = 18
@@ -29,6 +30,7 @@ object Form1: TForm1
     Top = 160
     Width = 55
     Caption = 'Assinatura'
+    ParentColor = False
   end
   object edAssinatura: TEdit
     Left = 20
@@ -53,6 +55,7 @@ object Form1: TForm1
     Top = 51
     Width = 503
     Caption = 'JWT -  Informe o HEADER e PayLoad em Base64 ou veja no botão gerar como usar a classe TJWT'
+    ParentColor = False
   end
   object edJWT: TEdit
     Left = 20
@@ -68,6 +71,7 @@ object Form1: TForm1
     Top = 216
     Width = 259
     Caption = 'Resultado - Pode ser validado em https://jwt.io/  '
+    ParentColor = False
   end
   object mJWT: TMemo
     Left = 20

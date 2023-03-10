@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Horse, Horse.JWT, SysUtils;
 
-procedure GetPing(Req: THorseRequest; Res: THorseResponse; Next: TNextProc);
+procedure GetPing(Req: THorseRequest; Res: THorseResponse);
 begin
   Res.Send('Pong');
 end;

@@ -22,21 +22,21 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="66" Y="9"/>
+        <TopLine Value="42"/>
+        <CursorPos X="12" Y="57"/>
         <UsageCount Value="27"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\packages\fcl-web\src\base\fpjwt.pp"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="164"/>
         <CursorPos X="20" Y="164"/>
         <UsageCount Value="12"/>
-        <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="17">
+    <JumpHistory HistoryIndex="14">
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="9"/>
@@ -74,26 +74,6 @@
         <Caret Line="69" Column="16" TopLine="51"/>
       </Position>
       <Position>
-        <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\packages\fcl-web\src\base\fpjwt.pp"/>
-        <Caret Line="132" Column="14" TopLine="115"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\packages\fcl-web\src\base\fpjwt.pp"/>
-        <Caret Line="122" Column="20" TopLine="105"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\packages\fcl-web\src\base\fpjwt.pp"/>
-        <Caret Line="166" Column="3" TopLine="164"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\packages\fcl-web\src\base\fpjwt.pp"/>
-        <Caret Line="132" Column="14" TopLine="115"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\fpcupdeluxe\Laz32\fpcsrc\packages\fcl-web\src\base\fpjwt.pp"/>
-        <Caret Line="122" Column="19" TopLine="108"/>
-      </Position>
-      <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="93" Column="110" TopLine="65"/>
       </Position>
@@ -108,6 +88,14 @@
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="97" Column="33" TopLine="69"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="92" Column="3"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="9" Column="61"/>
       </Position>
     </JumpHistory>
     <RunParams>

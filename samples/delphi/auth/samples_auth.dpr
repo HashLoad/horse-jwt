@@ -16,7 +16,7 @@ begin
   THorse.Use(Jhonson);
 
   THorse.Get('/auth',
-    procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+    procedure(Req: THorseRequest; Res: THorseResponse)
     var
       LToken: TJWT;
     begin

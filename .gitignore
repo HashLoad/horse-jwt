@@ -4,6 +4,8 @@ static/
 **/Win32/
 **/Win64/
 **/Linux64/
+**/backup/
+**/lib/
 **/__history/
 **/__recovery/
 src/*.~*
@@ -24,6 +26,7 @@ src/*.~*
 *.lib
 *.a
 *.o
+*lps
 *.ocx
 *.local
 *.identcache

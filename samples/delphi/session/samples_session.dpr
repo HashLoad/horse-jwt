@@ -56,7 +56,7 @@ begin
   THorse.Use(Jhonson);
 
   THorse.Get('/auth',
-    procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+    procedure(Req: THorseRequest; Res: THorseResponse)
     var
       LJWT: TJWT;
       LClaims: TMyClaims;
@@ -80,7 +80,7 @@ begin
   THorse
     .AddCallback(HorseJWT('my-private-key', THorseJWTConfig.New.SessionClass(TMyClaims)))
     .Get('ping',
-      procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+      procedure(Req: THorseRequest; Res: THorseResponse)
       var
         LJSON: TJSONObject;
         LSession: TMyClaims;
@@ -95,9 +95,9 @@ begin
       end);
 
   THorse.Listen(9000,
-    procedure(Horse: THorse)
+    procedure
     begin
-      System.Writeln(Format('Server is running in %d. Press Enter to finish...', [Horse.Port]));
+      System.Writeln(Format('Server is running in %d. Press Enter to finish...', [THorse.Port]));
       System.Readln;
     end);
 
