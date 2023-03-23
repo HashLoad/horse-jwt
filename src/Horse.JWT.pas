@@ -278,27 +278,31 @@ begin
           LSession := LJSON;
 {$ENDIF}
         AHorseRequest.Session(LSession);
-        ANext();
       except
         on E: EHorseCallbackInterrupted do
           raise;
         on E: Exception do
         begin
-          AHorseResponse.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
+          AHorseResponse.Send('Unauthorized or invalid token authorization').Status(THTTPStatus.Unauthorized);
           raise EHorseCallbackInterrupted.Create;
         end;
       end;
+
+      try
+        ANext();
+      finally
+        {$IFNDEF FPC}
+        if Assigned(LSession) then
+          LSession.Free;
+        {$ENDIF}
+      end;
+
     finally
       LJWT.Free;
     end;
   except
     on E: EHorseCallbackInterrupted do
       raise;
-    on E: Exception do
-    begin
-      AHorseResponse.Send('Invalid token authorization. ' + E.Message).Status(THTTPStatus.Unauthorized);
-      raise EHorseCallbackInterrupted.Create;
-    end;
   end;
 end;
 
