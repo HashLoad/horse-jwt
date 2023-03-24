@@ -103,12 +103,10 @@ function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig = nil
 implementation
 
 {$IF DEFINED(FPC) AND NOT DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
-
 var
   SecretJWT: string;
   Config: IHorseJWTConfig;
 {$ENDIF}
-
 
 procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF}; const ASecretJWT: string; const AConfig: IHorseJWTConfig);
 var
@@ -169,7 +167,6 @@ var
     Result := (LJWT.Signature = LSignCalc);
   end;
 {$ENDIF}
-
 begin
   LConfig := AConfig;
   if AConfig = nil then
@@ -311,13 +308,11 @@ begin
 end;
 
 {$IF DEFINED(FPC) AND NOT DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
-
 procedure Callback(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF});
 begin
   Middleware(AHorseRequest, AHorseResponse, ANext, SecretJWT, Config);
 end;
 {$ENDIF}
-
 
 function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig): THorseCallback;
 {$IF DEFINED(FPC) AND DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
@@ -326,7 +321,6 @@ function HorseJWT(const ASecretJWT: string; const AConfig: IHorseJWTConfig): THo
     Middleware(AHorseRequest, AHorseResponse, ANext, ASecretJWT, AConfig);
   end;
 {$ENDIF}
-
 begin
 {$IF DEFINED(FPC)}
 {$IF NOT DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
