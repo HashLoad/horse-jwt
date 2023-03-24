@@ -112,6 +112,8 @@ procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseRespons
 var
 {$IF DEFINED(FPC)}
   LJWT: TJWT;
+  LStartTokenPayloadPos: Integer;
+  LEndTokenPayloadPos: Integer;
 {$ELSE}
   LBuilder: IJOSEConsumerBuilder;
   LValidations: IJOSEConsumer;
@@ -267,8 +269,9 @@ begin
           if LConfig.IsRequiredSubject and ((LJWT.Claims.sub) = EmptyStr) then
             raise Exception.Create('No Subject [sub] claim present');
         end;
-
-        LJSON := TJSONObject(LJWT.Claims.AsString);
+        LStartTokenPayloadPos := Pos('.', LToken) + 1;
+        LEndTokenPayloadPos := NPos('.', LToken, 2) - LStartTokenPayloadPos;
+        LJSON := GetJSON(LJWT.DecodeString(Copy(LToken, LStartTokenPayloadPos, LEndTokenPayloadPos))) as TJSONObject;
         if Assigned(LConfig.SessionClass) then
         begin
           LSession := LConfig.SessionClass.Create;
@@ -279,30 +282,31 @@ begin
 {$ENDIF}
         AHorseRequest.Session(LSession);
       except
-        on E: EHorseCallbackInterrupted do
-          raise;
         on E: Exception do
         begin
-          AHorseResponse.Send('Unauthorized or invalid token authorization').Status(THTTPStatus.Unauthorized);
+          AHorseResponse.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
           raise EHorseCallbackInterrupted.Create;
         end;
       end;
-
-      try
-        ANext();
-      finally
-        {$IFNDEF FPC}
-        if Assigned(LSession) then
-          LSession.Free;
-        {$ENDIF}
-      end;
-
     finally
       LJWT.Free;
     end;
   except
     on E: EHorseCallbackInterrupted do
       raise;
+    on E: Exception do
+    begin
+      AHorseResponse.Send('Invalid token authorization. ' + E.Message).Status(THTTPStatus.Unauthorized);
+      raise EHorseCallbackInterrupted.Create;
+    end;
+  end;
+  try
+    ANext();
+  finally
+    {$IFNDEF FPC}
+    if Assigned(LSession) then
+      LSession.Free;
+    {$ENDIF}
   end;
 end;
 
