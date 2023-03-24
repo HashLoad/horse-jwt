@@ -303,12 +303,7 @@ begin
       raise EHorseCallbackInterrupted.Create;
     end;
   end;
-  try
-    ANext();
-  except
-    on E: EHorseCallbackInterrupted do
-      raise;
-  end;
+  ANext();
 end;
 
 {$IF DEFINED(FPC) AND NOT DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}
