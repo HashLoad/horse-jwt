@@ -108,6 +108,11 @@ var
   Config: IHorseJWTConfig;
 {$ENDIF}
 
+const
+  TOKEN_NOT_FOUND = 'Token not found';
+  INVALID_AUTHORIZATION_TYPE = 'Invalid authorization type';
+  UNAUTHORIZED = 'Unauthorized';
+
 procedure Middleware(AHorseRequest: THorseRequest; AHorseResponse: THorseResponse; ANext: {$IF DEFINED(FPC)}TNextProc{$ELSE}TProc{$ENDIF}; const ASecretJWT: string; const AConfig: IHorseJWTConfig);
 var
 {$IF DEFINED(FPC)}
@@ -190,14 +195,14 @@ begin
     LConfig.Header, LToken) and not AHorseRequest.Query.TryGetValue(
     LHeaderNormalize, LToken) then
   begin
-    AHorseResponse.Send('Token not found').Status(THTTPStatus.Unauthorized);
-    raise EHorseCallbackInterrupted.Create;
+    AHorseResponse.Send(TOKEN_NOT_FOUND).Status(THTTPStatus.Unauthorized);
+    raise EHorseCallbackInterrupted.Create(TOKEN_NOT_FOUND);
   end;
 
   if Pos('bearer', LowerCase(LToken)) = 0 then
   begin
-    AHorseResponse.Send('Invalid authorization type').Status(THTTPStatus.Unauthorized);
-    raise EHorseCallbackInterrupted.Create;
+    AHorseResponse.Send(INVALID_AUTHORIZATION_TYPE).Status(THTTPStatus.Unauthorized);
+    raise EHorseCallbackInterrupted.Create(INVALID_AUTHORIZATION_TYPE);
   end;
 
   LToken := Trim(LToken.Replace('bearer', '', [rfIgnoreCase]));
@@ -284,8 +289,8 @@ begin
       except
         on E: Exception do
         begin
-          AHorseResponse.Send('Unauthorized').Status(THTTPStatus.Unauthorized);
-          raise EHorseCallbackInterrupted.Create;
+          AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
+          raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
         end;
       end;
     finally
