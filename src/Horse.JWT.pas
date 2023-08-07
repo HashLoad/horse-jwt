@@ -1,7 +1,7 @@
 unit Horse.JWT;
 
 {$IF DEFINED(FPC)}
-{$MODE DELPHI}{$H+}
+  {$MODE DELPHI}{$H+}
 {$ENDIF}
 
 interface
@@ -224,8 +224,20 @@ begin
         LBuilder.SetRequireSubject;
     end;
 
-    LJWT := TJOSEContext.Create(LToken, TJWTClaims);
     try
+      LJWT := TJOSEContext.Create(LToken, TJWTClaims);
+    except
+      AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
+      raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
+    end;
+
+    try
+      if LJWT.GetJOSEObject = nil then
+      begin
+        AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
+        raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
+      end;
+
       LValidations := LBuilder.Build;
       try
         LValidations.ProcessContext(LJWT);

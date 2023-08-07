@@ -6,7 +6,7 @@
 	"mainsrc": "./",
 	"projects": [],
 	"dependencies": {
-		"github.com/hashload/horse": "^3.1.0",
+		"github.com/hashload/horse": "^3.1.4",
 		"github.com/paolo-rossi/delphi-jose-jwt": "^v3.2.0"
 	}
 }
