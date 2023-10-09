@@ -291,8 +291,13 @@ begin
         LJSON := GetJSON(LJWT.DecodeString(copy(LToken, LStartTokenPayloadPos, LEndTokenPayloadPos))) as TJSONObject;
         if Assigned(LConfig.SessionClass) then
         begin
-          LSession := LConfig.SessionClass.Create;
-          TClaims(LSession).LoadFromJSON(LJSON);
+          try
+            LSession := LConfig.SessionClass.Create;
+            TClaims(LSession).LoadFromJSON(LJSON);
+          finally
+            if Assigned(LJSON) then
+              LJSON.Free;
+          end;
         end
         else
           LSession := LJSON;
