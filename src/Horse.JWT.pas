@@ -191,6 +191,9 @@ begin
     LHeaderNormalize[1] := UpCase(LHeaderNormalize[1]);
 
   LToken := AHorseRequest.Headers[LConfig.Header];
+  if LToken.IsEmpty then
+    LToken := AHorseRequest.Cookie.Items[LConfig.Header];
+    
   if LToken.Trim.IsEmpty and not AHorseRequest.Query.TryGetValue(
     LConfig.Header, LToken) and not AHorseRequest.Query.TryGetValue(
     LHeaderNormalize, LToken) then
