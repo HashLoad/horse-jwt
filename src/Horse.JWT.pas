@@ -38,7 +38,11 @@ uses
   Horse.Commons;
 
 type
+  {$IF DEFINED(FPC)}
+  TOnResponse = {$IF DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}reference to {$ENDIF}procedure(const AHorseResponse: THorseResponse; const AMessage: string; const AHTTPStatus: THTTPStatus);
+  {$ELSE}
   TOnResponse = reference to procedure(const AHorseResponse: THorseResponse; const AMessage: string; const AHTTPStatus: THTTPStatus);
+  {$ENDIF}
 
   IHorseJWTConfig = interface
     ['{71A29190-1528-4E4D-932D-86094DDA9B4A}']
