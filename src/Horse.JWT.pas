@@ -38,10 +38,7 @@ uses
   Horse.Commons;
 
 type
-  TOnResponse = reference to procedure(
-    const AHorseResponse: THorseResponse;
-    const AMessage: string;
-    const AStatus: THTTPStatus);
+  TOnResponse = reference to procedure(const AHorseResponse: THorseResponse; const AMessage: string; const AHTTPStatus: THTTPStatus);
 
   IHorseJWTConfig = interface
     ['{71A29190-1528-4E4D-932D-86094DDA9B4A}']
@@ -81,7 +78,7 @@ type
     FIsRequiredNotBefore: Boolean;
     FIsRequiredSubject: Boolean;
     FSessionClass: TClass;
-	FOnResponse: TOnResponse;						 
+	  FOnResponse: TOnResponse;
     function SkipRoutes: TArray<string>; overload;
     function SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig; overload;
     function SkipRoutes(const ARoute: string): IHorseJWTConfig; overload;
@@ -102,7 +99,7 @@ type
     function SessionClass: TClass; overload;
     function SessionClass(const AValue: TClass): IHorseJWTConfig; overload;
 	  function OnResponse: TOnResponse; overload;
-    function OnResponse(const AValue: TOnResponse): IHorseJWTConfig; overload;										   
+    function OnResponse(const AValue: TOnResponse): IHorseJWTConfig; overload;
   public
     constructor Create;
     class function New: IHorseJWTConfig;
@@ -212,7 +209,6 @@ begin
       LConfig.OnResponse()(AHorseResponse, TOKEN_NOT_FOUND, THTTPStatus.Unauthorized)
     else
       AHorseResponse.Send(TOKEN_NOT_FOUND).Status(THTTPStatus.Unauthorized);
-
     raise EHorseCallbackInterrupted.Create(TOKEN_NOT_FOUND);
   end;
 
@@ -222,7 +218,6 @@ begin
        LConfig.OnResponse()(AHorseResponse, INVALID_AUTHORIZATION_TYPE, THTTPStatus.Unauthorized)
     else
       AHorseResponse.Send(INVALID_AUTHORIZATION_TYPE).Status(THTTPStatus.Unauthorized);
-
     raise EHorseCallbackInterrupted.Create(INVALID_AUTHORIZATION_TYPE);
   end;
 
@@ -252,7 +247,6 @@ begin
         LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized)
       else
         AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
-
       raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
     end;
 
@@ -263,7 +257,6 @@ begin
           LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized)
         else
           AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
-
         raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
       end;
 
@@ -339,7 +332,6 @@ begin
             LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized)
           else
             AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
-
           raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
         end;
       end;
@@ -355,7 +347,6 @@ begin
         LConfig.OnResponse()(AHorseResponse, 'Invalid token authorization. ' + E.Message, THTTPStatus.Unauthorized)
       else
         AHorseResponse.Send('Invalid token authorization. ' + E.Message).Status(THTTPStatus.Unauthorized);
-
       raise EHorseCallbackInterrupted.Create;
     end;
   end;
@@ -528,12 +519,10 @@ begin
   Result := FOnResponse;
 end;
 
-
 function THorseJWTConfig.OnResponse(const AValue: TOnResponse): IHorseJWTConfig;
 begin
   FOnResponse := AValue;
   Result := Self;
 end;
-
 
 end.
