@@ -288,7 +288,7 @@ begin
             'The JWT is no longer valid - the evaluation time [%s] is on or after the Expiration Time [exp=%s]',
             [DateToISO8601(Now, False), DateToISO8601(LJWT.Claims.exp, False)]));
 
-        if (LJWT.Claims.nbf <> 0) and (LJWT.Claims.nbf < DateTimeToUnix(Now)) then
+        if (LJWT.Claims.nbf <> 0) and not (LJWT.Claims.nbf <= DateTimeToUnix(Now)) then
           raise Exception.Create(Format('The JWT is not yet valid as the evaluation time [%s] is before the NotBefore [nbf=%s]',
             [DateToISO8601(Now, False), DateToISO8601(LJWT.Claims.nbf)]));
 
