@@ -39,9 +39,9 @@ uses
 
 type
   {$IF DEFINED(FPC)}
-  TOnResponse = {$IF DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}reference to {$ENDIF}procedure(const AHorseResponse: THorseResponse; const AMessage: string; const AHTTPStatus: THTTPStatus);
+  TOnResponse = {$IF DEFINED(HORSE_FPC_FUNCTIONREFERENCES)}reference to {$ENDIF}procedure(const AHorseResponse: THorseResponse; const AMessage: string; const AHTTPStatus: THTTPStatus; const APathInfo: string);
   {$ELSE}
-  TOnResponse = reference to procedure(const AHorseResponse: THorseResponse; const AMessage: string; const AHTTPStatus: THTTPStatus);
+  TOnResponse = reference to procedure(const AHorseResponse: THorseResponse; const AMessage: string; const AHTTPStatus: THTTPStatus; const APathInfo: string);
   {$ENDIF}
 
   IHorseJWTConfig = interface
@@ -210,7 +210,7 @@ begin
     LHeaderNormalize, LToken) then
   begin
     if Assigned(LConfig.OnResponse()) then
-      LConfig.OnResponse()(AHorseResponse, TOKEN_NOT_FOUND, THTTPStatus.Unauthorized)
+      LConfig.OnResponse()(AHorseResponse, TOKEN_NOT_FOUND, THTTPStatus.Unauthorized,LPathInfo)
     else
       AHorseResponse.Send(TOKEN_NOT_FOUND).Status(THTTPStatus.Unauthorized);
     raise EHorseCallbackInterrupted.Create(TOKEN_NOT_FOUND);
@@ -219,7 +219,7 @@ begin
   if Pos('bearer', LowerCase(LToken)) = 0 then
   begin
     if Assigned(LConfig.OnResponse()) then
-       LConfig.OnResponse()(AHorseResponse, INVALID_AUTHORIZATION_TYPE, THTTPStatus.Unauthorized)
+       LConfig.OnResponse()(AHorseResponse, INVALID_AUTHORIZATION_TYPE, THTTPStatus.Unauthorized,LPathInfo)
     else
       AHorseResponse.Send(INVALID_AUTHORIZATION_TYPE).Status(THTTPStatus.Unauthorized);
     raise EHorseCallbackInterrupted.Create(INVALID_AUTHORIZATION_TYPE);
@@ -248,7 +248,7 @@ begin
       LJWT := TJOSEContext.Create(LToken, TJWTClaims);
     except
       if Assigned(LConfig.OnResponse()) then
-        LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized)
+        LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized,LPathInfo)
       else
         AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
       raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
@@ -258,7 +258,7 @@ begin
       if LJWT.GetJOSEObject = nil then
       begin
         if Assigned(LConfig.OnResponse()) then
-          LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized)
+          LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized,LPathInfo)
         else
           AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
         raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
@@ -333,7 +333,7 @@ begin
         on E: Exception do
         begin
           if Assigned(LConfig.OnResponse()) then
-            LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized)
+            LConfig.OnResponse()(AHorseResponse, UNAUTHORIZED, THTTPStatus.Unauthorized,LPathInfo)
           else
             AHorseResponse.Send(UNAUTHORIZED).Status(THTTPStatus.Unauthorized);
           raise EHorseCallbackInterrupted.Create(UNAUTHORIZED);
@@ -348,7 +348,7 @@ begin
     on E: Exception do
     begin
       if Assigned(LConfig.OnResponse()) then
-        LConfig.OnResponse()(AHorseResponse, 'Invalid token authorization. ' + E.Message, THTTPStatus.Unauthorized)
+        LConfig.OnResponse()(AHorseResponse, 'Invalid token authorization. ' + E.Message, THTTPStatus.Unauthorized,LPathInfo)
       else
         AHorseResponse.Send('Invalid token authorization. ' + E.Message).Status(THTTPStatus.Unauthorized);
       raise EHorseCallbackInterrupted.Create;
