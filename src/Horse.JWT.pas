@@ -402,11 +402,19 @@ end;
 function THorseJWTConfig.SkipRoutes(const ARoutes: TArray<string>): IHorseJWTConfig;
 var
   I: Integer;
+  LPrefix: String;
 begin
+  LPrefix := THorse.Routes.GetPrefix();
   FSkipRoutes := ARoutes;
+
   for I := 0 to Pred(Length(FSkipRoutes)) do
+  begin
     if copy(Trim(FSkipRoutes[I]), 1, 1) <> '/' then
       FSkipRoutes[I] := '/' + FSkipRoutes[I];
+	
+    FSkipRoutes[I] := LPrefix + FSkipRoutes[I];
+  end;
+
   Result := Self;
 end;
 
